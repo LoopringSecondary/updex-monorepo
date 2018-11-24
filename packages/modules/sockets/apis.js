@@ -7,14 +7,14 @@ import Notification from 'LoopringUI/components/Notification'
 import {LooprAccount, UpWalletAccount, ImTokenAccount} from "common/wallets/account";
 
 const updateItems = (items,id)=>{
-  const dispatch = window._store.dispatch
+  const dispatch = require('root/src/index.js').default._store.dispatch
   dispatch({
     type:'sockets/itemsChange',
     payload:{id,items,loading:false}
   })
 }
 const updateItem = (item,id)=>{
-  const dispatch = window._store.dispatch
+  const dispatch = require('root/src/index.js').default._store.dispatch
   dispatch({
     type:'sockets/itemChange',
     payload:{id,item,loading:false}
@@ -30,7 +30,7 @@ const sorter = (a, b)=>{
 }
 
 const updateEstimateGasPrice = (item,id)=>{
-  const dispatch = window._store.dispatch
+  const dispatch = require('root/src/index.js').default._store.dispatch
   if(item.value) {
     const gasPrice = toFixed(toBig(item.value).div(1e9))
     dispatch({
@@ -42,7 +42,7 @@ const updateEstimateGasPrice = (item,id)=>{
 
 const updateScannedAddress = (item, id) => {
   if (item && item.owner) {
-    const dispatch = window._store.dispatch
+    const dispatch = require('root/src/index.js').default._store.dispatch
     dispatch({type: 'scanAddress/addressChanged', payload: {address: item.owner}})
     const loopringUnlockWith = storage.wallet.getLoopringUnlockWith()
     switch(loopringUnlockWith) {
@@ -70,7 +70,7 @@ const updateScannedAddress = (item, id) => {
 
 const updateNotified = (item, id) => {
   if(item && item.status === 'accept') {
-    const dispatch = window._store.dispatch
+    const dispatch = require('root/src/index.js').default._store.dispatch
     dispatch({type: 'p2pOrder/setFetchOrder', payload: {fetchOrder:true}})
   }
 }

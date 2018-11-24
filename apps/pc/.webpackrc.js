@@ -36,6 +36,7 @@ export default {
     "modules":path.resolve(__dirname, '../../packages/modules'),
     // "mobile":`${__dirname}/src/dex`,
     "mobile":path.resolve(__dirname, './src/dex'),
+    "root":path.resolve(__dirname, './'),
   },
   extraResolveModules:[path.resolve(__dirname, './node_modules/'),path.resolve(__dirname, '../../packages'),],
   "theme": {
