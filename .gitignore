@@ -1,0 +1,13 @@
+node_modules
+.DS_Store
+lerna-debug.log
+npm-debug.log
+package-lock.json
+yarn.lock
+.eslintcache
+databases
+build
+dist
+.vscode/
+.tmp/
+npmrc

@@ -1,0 +1,104 @@
+@color-text-placeholder:rgba(0,0,0,0.25) ;
+@border-color:rgba(0,0,0,0.1);
+
+.color-black{
+  color:#000 !important;
+  // color:#FFFDE7 !important;
+  // color:#C5CAE9 !important;
+}
+.color-black-1{
+  color:rgba(0,0,0,0.9) !important;
+  // color:#C5CAE9 !important;
+}
+.color-black-2{
+  // color:rgba(0,0,0,0.65) !important;
+  color:rgba(0,0,0,0.9) !important;
+}
+.color-black-3{
+  // color:rgba(0,0,0,0.45) !important;
+  color:rgba(0,0,0,0.3) !important;
+}
+.color-black-4{
+  color:rgba(0,0,0,0.3) !important;
+}
+// .color-black{
+//   color:#fafafa !important;
+// }
+// .color-black-1{
+//   color:#fafafa !important;
+// }
+// .color-black-2{
+//   color:#dadada !important;
+// }
+// .color-black-3{
+//   color:#5f6368;
+// }
+// .color-black-4{
+//   color:#5f6368;
+// }
+.hover-default:active, .hover-default:hover {
+  background: @bg-fill  !important;
+}
+.bg-primary{
+	.color-black{
+		color:#fff !important;
+	}
+	.color-black-1{
+    color:rgba(255,255,255,0.9) !important;
+  }
+  .color-black-2{
+		color:rgba(255,255,255,0.8) !important;
+	}
+
+	&.color-black{
+		color:#fff !important;
+	}
+	&.color-black-1{
+		color:rgba(255,255,255,0.9) !important;
+	}
+}
+
+.am-search{
+  background: transparent !important;
+  .am-search-input{
+    background: @fill-body !important;
+    input[type="search"]{
+      color:#333;
+    }
+  }
+  .am-search-clear{
+
+  }
+}
+.am-list-item{
+  &.circle{
+    background: @bg-fill !important;
+  }
+}
+.am-segment.side-buy{
+  .am-segment-item{
+   background: @bg-fill !important;
+  }
+}
+.am-segment.side-sell{
+  .am-segment-item{
+    background: @bg-fill !important;
+  }
+}
+.settings{
+  .am-list{
+    .am-list-body{
+      background: @bg-fill !important;
+    }  
+  }
+  .am-list-body{
+    background: @bg-fill !important;
+  }
+}
+a:hover,a:active{
+  // color:inherit !important;
+  color:@brand-primary !important;
+  &.am-button-primary{
+    color:@brand-primary !important;
+  }
+}
