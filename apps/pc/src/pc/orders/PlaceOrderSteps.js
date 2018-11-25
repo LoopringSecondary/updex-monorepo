@@ -111,7 +111,7 @@ class PlaceOrderSteps extends React.Component {
     }
     const showTTL = () => {
       // hideLayer({id:'placeOrderSteps'})
-      showLayer({id: 'helperOfTTL'})
+      showLayer({id: 'setTTL'})
     }
     const showLRCFee = () => {
       // hideLayer({id:'placeOrderSteps'})
