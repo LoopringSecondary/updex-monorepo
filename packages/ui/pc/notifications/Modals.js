@@ -1,14 +1,14 @@
 import React from 'react'
 import Containers from 'modules/containers'
 import UiContainers from 'LoopringUI/containers'
-import UserCenter from './UserCenter'
+import Notifications from './Notifications'
 
 function Modals(props) {
   return (
     <div>
-      <Containers.Layers id="usercenter">
-        <UiContainers.Drawer position="right" id="usercenter" width="27.5vw"  style={{margin:'0 auto',height:'100%'}}>
-          <UserCenter />
+      <Containers.Layers id="notifications">
+        <UiContainers.Drawer position="right" id="notifications" width="25vw"  style={{margin:'0 auto',height:'100%'}}>
+          <Notifications />
         </UiContainers.Drawer>
       </Containers.Layers>
     </div>
