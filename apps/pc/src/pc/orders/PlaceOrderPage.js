@@ -3,7 +3,6 @@ import { List, InputItem,Button,WingBlank,Slider, Tabs, WhiteSpace, Badge,Segmen
 import { Icon as WebIcon,Switch as WebSwitch} from 'antd'
 import { connect } from 'dva'
 import routeActions from 'common/utils/routeActions'
-import LayoutPCDEX from '../../layout/LayoutPCDEX'
 import {getTokensByMarket} from 'modules/formatter/common'
 import HelperOfMyMarketOrders from 'ui/dex/orders/HelperOfMyMarketOrders'
 import HelperOfBalance from 'ui/dex/orders/HelperOfBalance'
@@ -64,7 +63,7 @@ class PlaceOrderPage extends React.Component {
     }
 
     return (
-      <LayoutPCDEX {...this.props}>
+      <div >
         <div className="">
           <NavBar
             className="bg-white"
@@ -110,7 +109,7 @@ class PlaceOrderPage extends React.Component {
         </div>
         <div className="pb50"></div>
         <div className="pb20"></div>
-      </LayoutPCDEX>
+      </div>
     );
   }
 }

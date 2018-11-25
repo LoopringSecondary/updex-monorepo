@@ -10,7 +10,7 @@ import HelperOfMarkets from './HelperOfMarkets'
 import Face2FaceForm from './Face2FaceForm'
 import intl from 'react-intl-universal'
 import {store} from "../index";
-import NumberOfTodos from "../dex/notifications/NumberOfTodos";
+import NumberOfTodos from "ui/dex/notifications/NumberOfTodos";
 
 class Face2FacePage extends React.Component {
   

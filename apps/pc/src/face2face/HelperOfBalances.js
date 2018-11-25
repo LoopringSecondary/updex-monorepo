@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'dva';
 import {Button} from 'antd-mobile';
 import {Icon,Spin} from 'antd';
-import EnableSwitch from '../dex/tokens/EnableSwitch';
+import EnableSwitch from 'ui/dex/tokens/EnableSwitch';
 import routeActions from 'common/utils/routeActions'
 import {getTokensByMarket} from 'modules/formatter/common'
 import TokenFM, {getBalanceBySymbol} from 'modules/tokens/TokenFm'

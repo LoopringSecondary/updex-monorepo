@@ -9,7 +9,7 @@ import { signMessage } from 'common/utils/signUtils'
 import storage from 'modules/storage'
 import intl from 'react-intl-universal'
 import TokenFm from 'modules/tokens/TokenFm'
-import { renders } from '../dex/orders/ListOrders'
+import { renders } from 'ui/dex/orders/ListOrders'
 import Worth from 'modules/settings/Worth'
 
 class Face2FaceOrders extends React.Component {

@@ -3,9 +3,8 @@ import { Redirect, Route, Switch } from 'dva/router'
 import storage from 'modules/storage'
 import Face2FacePage from './Face2FacePage'
 import Face2FaceModals from './Modals'
-import TokenModals from '../dex/tokens/Modals'
-
-import NotificationsModals from '../dex/notifications/Modals'
+import TokenModals from 'ui/dex/tokens/Modals'
+import NotificationsModals from 'ui/dex/notifications/Modals'
 
 const Logged = (props)=>{
   const isLogged = true

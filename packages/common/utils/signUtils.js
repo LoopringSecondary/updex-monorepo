@@ -1,8 +1,8 @@
 import storage from 'modules/storage'
-import Imtoken from 'mobile/auth/imtoken/Imtoken'
-import Loopr from 'mobile/auth/loopr/loopr'
-import Mock from 'mobile/auth/mock/mock'
-import TPWallet from 'mobile/auth/tpwallet/TPWallet'
+import Imtoken from 'ui/dex/auth/imtoken/Imtoken'
+import Loopr from 'ui/dex/auth/loopr/loopr'
+import Mock from 'ui/dex/auth/mock/mock'
+import TPWallet from 'ui/dex/auth/tpwallet/TPWallet'
 
 export function signMessage (message) {
   if (window.Wallet) {
