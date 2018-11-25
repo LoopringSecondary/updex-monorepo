@@ -1,7 +1,7 @@
 import React from 'react'
 import {Containers} from 'modules'
 import UiContianers from 'LoopringUI/containers'
-import Detail from './Detail'
+import Detail from 'ui/dex/fills/Detail'
 function Modals(props) {
   return (
     <div>
