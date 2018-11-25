@@ -5,10 +5,10 @@ import Markets from '../tickers/Markets';
 import PlaceOrderForm from '../orders/PlaceOrderForm';
 import PlaceOrderFormNoSide from '../orders/PlaceOrderFormNoSide';
 import HelperOfDepth from '../orders/HelperOfDepth';
-import HelperOfMyMarketOrders from 'mobile/orders/HelperOfMyMarketOrders';
+import HelperOfMyMarketOrders from 'ui/dex/orders/HelperOfMyMarketOrders';
 import ListMarketFills from '../fills/ListMarketFills';
-import HelperOfBalance from 'mobile/orders/HelperOfBalance';
-import Kline from 'mobile/charts/Kline';
+import HelperOfBalance from 'ui/dex/orders/HelperOfBalance';
+import Kline from 'ui/dex/charts/Kline';
 import Header from './Header'
 import PanelHeader from './PanelHeader'
 import PanelWrapper from './PanelWrapper'

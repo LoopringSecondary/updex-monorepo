@@ -1,10 +1,10 @@
 import React from 'react'
 import {Containers} from 'modules'
 import UiContianers from 'LoopringUI/containers'
-import Receive from 'mobile/tokens/Receive'
+import Receive from 'ui/dex/tokens/Receive'
 import Convert from './ConvertForm'
 import HelperOfEnable from './HelperOfEnable'
-import HelperOfTokenActions from 'mobile/tokens/HelperOfTokenActions'
+import HelperOfTokenActions from 'ui/dex/tokens/HelperOfTokenActions'
 
 function Modals(props) {
   return (

@@ -35,6 +35,7 @@ export default {
     // "modules":`${__dirname}/packages/modules`,
     "modules":path.resolve(__dirname, '../../packages/modules'),
     // "mobile":`${__dirname}/src/dex`,
+    "ui":path.resolve(__dirname, '../../packages/ui'),
     "mobile":path.resolve(__dirname, './src/dex'),
     "root":path.resolve(__dirname, './'),
   },

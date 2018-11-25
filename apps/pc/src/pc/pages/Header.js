@@ -5,7 +5,7 @@ import { Icon as WebIcon } from 'antd';
 import TickerItem from '../tickers/TickerItem';
 import storage from 'modules/storage'
 import UserInfo from '../account/UserInfo'
-import NumberOfTodos from 'mobile/notifications/NumberOfTodos'
+import NumberOfTodos from 'ui/dex/notifications/NumberOfTodos'
 
 
 class Header extends React.Component {

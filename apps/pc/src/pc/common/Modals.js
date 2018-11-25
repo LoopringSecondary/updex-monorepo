@@ -1,7 +1,7 @@
 import React from 'react'
 import Containers from 'modules/containers'
 import UiContainers from 'LoopringUI/containers'
-import HelperOfGas from 'mobile/common/HelperOfGas'
+import HelperOfGas from 'ui/dex/common/HelperOfGas'
 
 export function HelperOfGasModal(){
   return (

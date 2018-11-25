@@ -4,7 +4,7 @@ import { Icon as WebIcon } from 'antd'
 import { Link, Redirect, Route, Switch } from 'dva/router'
 import Containers from 'modules/containers'
 import routeActions from 'common/utils/routeActions'
-import { OpenOrderList, PullRefreshOrders } from 'mobile/orders/ListOrders'
+import { OpenOrderList, PullRefreshOrders } from 'ui/dex/orders/ListOrders'
 import ListBalance from '../tokens/ListBalance'
 import { getShortAddress } from 'modules/formatter/common'
 import storage from 'modules/storage'
@@ -12,7 +12,7 @@ import intl from 'react-intl-universal'
 import {connect} from 'dva'
 import copy from 'copy-to-clipboard';
 import Notification from 'LoopringUI/components/Notification'
-import ListMyFills from 'mobile/fills/ListMyFills'
+import ListMyFills from 'ui/dex/fills/ListMyFills'
 
 class UserCenter extends React.Component {
   render() {

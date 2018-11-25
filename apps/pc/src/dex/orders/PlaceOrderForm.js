@@ -15,8 +15,8 @@ import Worth from 'modules/settings/Worth'
 const Item = List.Item;
 
 // 通过自定义 moneyKeyboardWrapProps 修复虚拟键盘滚动穿透问题
-// https://github.com/ant-design/ant-design-mobile/issues/307
-// https://github.com/ant-design/ant-design-mobile/issues/163
+// https://github.com/ant-design/ant-design-ui/dex/issues/307
+// https://github.com/ant-design/ant-design-ui/dex/issues/163
 const isIPhone = new RegExp('\\biPhone\\b|\\biPod\\b', 'i').test(window.navigator.userAgent);
 let moneyKeyboardWrapProps;
 if (isIPhone) {
