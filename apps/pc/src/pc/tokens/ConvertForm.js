@@ -11,7 +11,7 @@ import intl from 'react-intl-universal'
 import storage from 'modules/storage'
 import Worth from 'modules/settings/Worth'
 import { signTx } from 'common/utils/signUtils'
-import ConvertHelperOfBalance from './ConvertHelperOfBalance'
+import ConvertHelperOfBalance from 'ui/dex/tokens/ConvertHelperOfBalance'
 import { keccakHash } from 'LoopringJS/common/utils'
 import {HelperOfSignStepsModal} from '../sign/Modals'
 
