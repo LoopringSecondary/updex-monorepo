@@ -38,4 +38,5 @@ function Modals(props) {
     </div>
   )
 }
+
 export default Modals

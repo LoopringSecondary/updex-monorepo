@@ -13,7 +13,6 @@ import Worth from 'modules/settings/Worth'
 import { signTx } from 'common/utils/signUtils'
 import ConvertHelperOfBalance from './ConvertHelperOfBalance'
 import { keccakHash } from 'LoopringJS/common/utils'
-import {HelperOfGasModal} from '../common/Modals'
 import {HelperOfSignStepsModal} from '../sign/Modals'
 
 const WETH = Contracts.WETH
@@ -191,7 +190,6 @@ class Convert extends React.Component {
         </div>
         <div className="divider zb-b-b 1px mb10"></div>
         <ConvertHelperOfBalance dispatch={dispatch} token={{symbol:token,balance:assets.balance,balance2:other_assets.balance}} gasFee={gasFee}/>
-        <HelperOfGasModal />
         <HelperOfSignStepsModal />
       </div>
     )

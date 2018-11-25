@@ -8,6 +8,7 @@ import SetLayout from './SetLayout'
 import SetLRCFee from 'ui/dex/settings/SetLRCFee'
 import SetTheme from 'ui/dex/settings/SetTheme'
 import SetTTL from 'ui/dex/settings/SetTTL'
+import HelperOfGas from 'ui/dex/settings/HelperOfGas'
 import SetIsDeveloper from 'ui/dex/settings/SetIsDeveloper'
 
 export function SetLanguageModal(){
@@ -74,6 +75,15 @@ export function SetTTLModal(){
     </Containers.Layers>
   )
 }
+export function HelperOfGasModal(){
+  return (
+    <Containers.Layers id="helperOfGas">
+      <UiContainers.Drawer id="helperOfGas" position="right" width="27.5rem" style={{height:'100%'}}>
+        <HelperOfGas />
+      </UiContainers.Drawer>
+    </Containers.Layers>
+  )
+}
 
 function Modals(props) {
   return (
@@ -90,6 +100,7 @@ function Modals(props) {
       <SetThemeModal />
       <SetTTLModal />
       <SetIsDeveloperModal />
+      <HelperOfGasModal />
     </div>
   )
 }
