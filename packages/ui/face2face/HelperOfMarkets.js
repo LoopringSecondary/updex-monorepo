@@ -5,7 +5,7 @@ import { Icon } from 'antd';
 import { toBig, toFixed, toNumber } from 'LoopringJS/common/formatter'
 import Worth from 'modules/settings/Worth'
 import intl from 'react-intl-universal'
-import {calculateWorthInLegalCurrency} from "../modules/orders/formatters";
+import {calculateWorthInLegalCurrency} from "modules/orders/formatters";
 
 const HelperOfMarkets = (props)=>{
   const {p2pOrder, marketcap, dispatch} = props

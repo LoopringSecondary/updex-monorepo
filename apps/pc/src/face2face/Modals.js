@@ -1,16 +1,15 @@
 import React from 'react'
 import Containers from 'modules/containers'
 import UiContainers from 'LoopringUI/containers'
-import HelperOfTokens from './HelperOfTokens'
+import HelperOfTokens from 'ui/face2face/HelperOfTokens'
 import HelperOfTTL from 'ui/dex/orders/HelperOfTTL'
-import HelperOfMiniFill from './HelperOfMiniFill'
-import HelperOfAmount from './HelperOfAmount'
-import HelperOfFAQ from './HelperOfFAQ'
-import HelperOfPrice from './HelperOfPrice'
+import HelperOfMiniFill from 'ui/face2face/HelperOfMiniFill'
+import HelperOfAmount from 'ui/face2face/HelperOfAmount'
+import HelperOfFAQ from 'ui/face2face/HelperOfFAQ'
+import HelperOfPrice from 'ui/face2face/HelperOfPrice'
 import Face2FaceConfirm from './Face2FaceConfirm'
-import OrderDetail from './Detail'
+import OrderDetail from 'ui/face2face/Detail'
 import OrderQrcode from './Qrcode'
-import TakerConfirm from './TakerConfirm'
 import Face2FacePage from './Face2FacePage'
 
 
@@ -35,11 +34,6 @@ function Modals(props) {
       <Containers.Layers id="face2FaceConfirm">
         <UiContainers.Drawer id="face2FaceConfirm" position="right" className="h-100" style={{height:'100%',width:"32.5rem",margin:'0 auto'}}>
           <Face2FaceConfirm />
-        </UiContainers.Drawer>
-      </Containers.Layers>
-      <Containers.Layers id="takerConfirm">
-        <UiContainers.Drawer id="takerConfirm" position="right" className="h-100" style={{height:'100%',width:"27.5rem",margin:'0 auto'}} >
-          <TakerConfirm />
         </UiContainers.Drawer>
       </Containers.Layers>
       <Containers.Layers id="orderQrcode">

@@ -6,7 +6,7 @@ import routeActions from 'common/utils/routeActions'
 import { getTokensByMarket } from 'modules/formatter/common'
 import HelperOfOrders from './HelperOfOrders'
 import HelperOfBalances from './HelperOfBalances'
-import HelperOfMarkets from './HelperOfMarkets'
+import HelperOfMarkets from 'ui/face2face/HelperOfMarkets'
 import Face2FaceForm from './Face2FaceForm'
 import intl from 'react-intl-universal'
 import {store} from "../index";

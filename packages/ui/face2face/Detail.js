@@ -6,7 +6,7 @@ import { connect } from 'dva'
 import { OrderFm } from 'modules/orders/OrderFm'
 import Worth from 'modules/settings/Worth'
 import storage from 'modules/storage'
-import DetailFills from 'mobile/orders/DetailFills'
+import DetailFills from 'ui/dex/orders/DetailFills'
 import {toFixed} from 'LoopringJS/common/formatter'
 import TokenFm from "modules/tokens/TokenFm";
 
