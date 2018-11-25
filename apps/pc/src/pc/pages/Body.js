@@ -1,7 +1,6 @@
 import React from 'react';
 import {connect} from 'dva'
 import intl from 'react-intl-universal';
-import Markets from '../tickers/Markets';
 import PlaceOrderForm from '../orders/PlaceOrderForm';
 import HelperOfDepth from '../orders/HelperOfDepth';
 import HelperOfMyMarketOrders from 'ui/dex/orders/HelperOfMyMarketOrders';

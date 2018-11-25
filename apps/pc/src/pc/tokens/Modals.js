@@ -3,7 +3,6 @@ import {Containers} from 'modules'
 import UiContianers from 'LoopringUI/containers'
 import Receive from 'ui/dex/tokens/Receive'
 import Convert from './ConvertForm'
-import HelperOfEnable from './HelperOfEnable'
 import HelperOfTokenActions from 'ui/dex/tokens/HelperOfTokenActions'
 
 function Modals(props) {
@@ -13,11 +12,6 @@ function Modals(props) {
           <UiContianers.Drawer id="receiveToken" position="right" className="h100" style={{width:'27.5rem',margin:'0 auto',height:'100%'}}>
             <Receive/>
           </UiContianers.Drawer>
-      </Containers.Layers>
-      <Containers.Layers id="helperOfEnable">
-          <UiContianers.Popups id="helperOfEnable">
-            <HelperOfEnable />
-          </UiContianers.Popups>
       </Containers.Layers>
       <Containers.Layers id="helperOfTokenActions">
           <UiContianers.Panels id="helperOfTokenActions" position="right"  className="rs h100" style={{width:'27.5rem',margin:'0 auto',height:'100%'}}>
