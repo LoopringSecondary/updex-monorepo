@@ -12,7 +12,6 @@ import PlaceOrder from './orders/PlaceOrderPage'
 import UserCenter from './account/UserCenter'
 import Notifications from './notifications/Notifications'
 import ListTodos from './notifications/ListTodos'
-import CommonModals from '../components/Modals'
 import storage from 'modules/storage'
 
 
@@ -45,7 +44,6 @@ const Logged = ()=>{
           <Route path={`/dex/settings`} exact component={Pages.Todo} />
           <Redirect from="/dex" to="/dex/placeOrder" />
         </Switch>
-        <CommonModals />
         <Orders.Modals />
         <Tokens.Modals />
         <Account.Modals />
