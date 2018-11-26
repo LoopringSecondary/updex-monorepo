@@ -12,7 +12,7 @@ import ListMyFills from '../fills/ListMyFills'
 import { getShortAddress } from 'modules/formatter/common'
 import storage from 'modules/storage'
 import intl from 'react-intl-universal'
-import NumberOfTodos from '../notifications/NumberOfTodos'
+import NumberOfTodos from 'ui/dex/notifications/NumberOfTodos'
 
 class UserCenter extends React.Component {
   render() {
