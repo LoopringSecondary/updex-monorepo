@@ -5,7 +5,7 @@ import ListMarketTickers from 'ui/dex/tickers/ListMarketTickers';
 import { NavBar,Icon } from 'antd-mobile';
 import { Icon as WebIcon } from 'antd';
 import routeActions from 'common/utils/routeActions'
-import LayoutDexHome from '../../layout/LayoutDexHome'
+import LayoutDexHome from 'ui/layout/LayoutDexHome'
 import {connect} from 'dva'
 
 class Markets extends React.Component {

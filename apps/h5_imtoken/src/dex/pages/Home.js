@@ -4,7 +4,7 @@ import routeActions from 'common/utils/routeActions'
 import intl from 'react-intl-universal'
 import { NavBar,Button } from 'antd-mobile'
 import { Icon } from 'antd'
-import LayoutDexHome from '../../layout/LayoutDexHome'
+import LayoutDexHome from 'ui/layout/LayoutDexHome'
 
 class Home extends React.Component {
   constructor(props) {
