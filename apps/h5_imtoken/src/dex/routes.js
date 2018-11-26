@@ -1,12 +1,12 @@
 import React from 'react'
 import { Redirect, Route, Switch } from 'dva/router'
 import Pages from './pages'
-import Orders from './orders'
 import Markets from './tickers/Markets'
 import MarketsSearch from 'ui/dex/tickers/ListSearchTickers'
 import MarketDetail from 'ui/dex/tickers/Detail'
 import Convert from './tokens/ConvertForm'
 import PlaceOrder from './orders/PlaceOrderPage'
+import OrdersModals from './orders/Modals'
 import UserCenter from './account/UserCenter'
 import ListTodos from './notifications/ListTodos'
 import SettingsModals from './settings/Modals'
@@ -42,7 +42,7 @@ const Logged = (props)=>{
           <Route path={`/dex/todos`} exact component={ListTodos} />
           <Redirect from="/dex" to= {`/dex/home`} />
         </Switch>
-        <Orders.Modals />
+        <OrdersModals />
         <TokensModals />
         <SignModals />
         <SettingsModals />
