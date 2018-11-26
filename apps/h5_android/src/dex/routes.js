@@ -2,8 +2,8 @@ import React from 'react'
 import { Redirect, Route, Switch } from 'dva/router'
 import Pages from './pages'
 import Orders from './orders'
-import Account from './account'
 import TokensModals from './tokens/Modals'
+import SettingsModals from './settings/Modals'
 import Markets from './tickers/Markets'
 import MarketsSearch from 'ui/dex/tickers/ListSearchTickers'
 import MarketDetail from 'ui/dex/tickers/Detail'
@@ -45,8 +45,8 @@ const Logged = ()=>{
         </Switch>
         <Orders.Modals />
         <TokensModals />
-        <Account.Modals />
         <NotificationsModals />
+        <SettingsModals />
       </div>
     )
   }else{
