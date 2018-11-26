@@ -3,7 +3,7 @@ import { List, InputItem,Button,WingBlank,Slider, Tabs, WhiteSpace, Badge,Segmen
 import { Icon as WebIcon,Switch as WebSwitch} from 'antd'
 import { connect } from 'dva'
 import routeActions from 'common/utils/routeActions'
-import LayoutDexHome from '../../layout/LayoutDexHome'
+import LayoutDexHome from 'ui/layout/LayoutDexHome'
 import {getTokensByMarket} from 'modules/formatter/common'
 import HelperOfMyMarketOrders from './HelperOfMyMarketOrders'
 import HelperOfMyMarketFills from './HelperOfMyMarketFills'
