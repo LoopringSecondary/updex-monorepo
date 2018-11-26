@@ -10,7 +10,7 @@ import MarketDetail from './tickers/Detail'
 import Convert from './tokens/ConvertForm'
 import PlaceOrder from './orders/PlaceOrderPage'
 import UserCenter from './account/UserCenter'
-import Notifications from './notifications/Notifications'
+import NotificationsModals from './notifications/Modals'
 import ListTodos from './notifications/ListTodos'
 import storage from 'modules/storage'
 
@@ -38,7 +38,6 @@ const Logged = ()=>{
           <Route path={`/dex/placeOrder/:market`} exact component={PlaceOrder} />
           <Route path={`/dex/usercenter`} component={UserCenter} />
           <Route path={`/dex/convert/:token`} component={Convert} />
-          <Route path={`/dex/notifications`} component={Notifications} />
           <Route path={`/dex/todos`} exact component={ListTodos} />
           <Route path={`/dex/messages`} exact component={Pages.Todo} />
           <Route path={`/dex/settings`} exact component={Pages.Todo} />
@@ -47,6 +46,7 @@ const Logged = ()=>{
         <Orders.Modals />
         <TokensModals />
         <Account.Modals />
+        <NotificationsModals />
       </div>
     )
   }else{
