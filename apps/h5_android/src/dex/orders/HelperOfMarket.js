@@ -2,7 +2,7 @@ import React from 'react';
 import { Input,Icon as WebIcon } from 'antd';
 import { Modal,List,Button,NavBar } from 'antd-mobile';
 import intl from 'react-intl-universal';
-import ListPlaceOrderTickers from '../tickers/ListPlaceOrderTickers'
+import ListPlaceOrderTickers from 'ui/dex/tickers/ListPlaceOrderTickers'
 import routeActions from 'common/utils/routeActions'
 import {connect} from 'dva'
 
