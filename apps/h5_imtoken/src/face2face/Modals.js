@@ -1,15 +1,14 @@
 import React from 'react'
 import Containers from 'modules/containers'
 import UiContainers from 'LoopringUI/containers'
-import HelperOfTokens from './HelperOfTokens'
-import HelperOfTTL from './HelperOfTTL'
-import HelperOfMiniFill from './HelperOfMiniFill'
-import HelperOfAmount from './HelperOfAmount'
-import HelperOfFAQ from './HelperOfFAQ'
-import HelperOfPrice from './HelperOfPrice'
+import HelperOfTokens from 'ui/face2face/HelperOfTokens'
+import HelperOfTTL from 'ui/dex/orders/HelperOfTTL'
+import HelperOfMiniFill from 'ui/face2face/HelperOfMiniFill'
+import HelperOfAmount from 'ui/face2face/HelperOfAmount'
+import HelperOfFAQ from 'ui/face2face/HelperOfFAQ'
+import HelperOfPrice from 'ui/face2face/HelperOfPrice'
+import OrderDetail from 'ui/face2face/Detail'
 import Face2FaceConfirm from './Face2FaceConfirm'
-import Settings from './Settings'
-import OrderDetail from './Detail'
 import OrderQrcode from './Qrcode'
 import TakerConfirm from './TakerConfirm'
 import SignOrderAndTxs from './SignOrderAndTxs'
@@ -55,11 +54,6 @@ function Modals(props) {
       <Containers.Layers id="helperOfFAQ">
         <UiContainers.Popups id="helperOfFAQ" className="h-100" style={{height:'100%'}}>
           <HelperOfFAQ />
-        </UiContainers.Popups>
-      </Containers.Layers>
-      <Containers.Layers id="settings">
-        <UiContainers.Popups id="settings" className="h-100" style={{height:'100%'}}>
-          <Settings />
         </UiContainers.Popups>
       </Containers.Layers>
       <Containers.Layers id="helperOfPrice">

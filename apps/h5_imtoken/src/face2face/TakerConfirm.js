@@ -16,7 +16,7 @@ import * as orderFormatter from 'modules/orders/formatters'
 import eachOfLimit from "async/eachOfLimit";
 import TokenFm from 'modules/tokens/TokenFm'
 import Worth from 'modules/settings/Worth'
-import HelperOfBalances from './HelperOfBalances'
+import HelperOfBalances from 'ui/face2face/HelperOfBalances'
 
 
 const OrderMetaItem = (props) => {

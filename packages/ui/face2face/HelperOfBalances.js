@@ -9,7 +9,7 @@ import TokenFM, {getBalanceBySymbol} from 'modules/tokens/TokenFm'
 import {FormatAmount} from 'modules/formatter/FormatNumber'
 import {formatLength, toBig, toFixed, toHex, toNumber} from "LoopringJS/common/formatter";
 import intl from 'react-intl-universal'
-import config from "../common/config";
+import config from "common/config";
 import storage from 'modules/storage'
 import mapLimit from 'async/mapLimit';
 import Available from 'modules/tokens/Available'
