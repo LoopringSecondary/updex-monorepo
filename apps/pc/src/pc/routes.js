@@ -2,13 +2,13 @@ import React from 'react'
 import { Redirect, Route, Switch } from 'dva/router'
 import Pages from './pages'
 import Orders from './orders'
-import Tokens from './tokens'
 import Account from './account'
 import MarketModals from './tickers/Modals'
 import AuthModals from './auth/Modals'
 import SettingsModals from './settings/Modals'
 import SignModals from './sign/Modals'
 import P2PModals from '../face2face/Modals'
+import TokensModals from './tokens/Modals'
 import NotificationModals from './notifications/Modals'
 import Convert from './tokens/ConvertForm'
 import PlaceOrder from './orders/PlaceOrderPage'
@@ -43,7 +43,7 @@ const Logged = ()=>{
         <NotificationModals />
         <MarketModals />
         <Orders.Modals />
-        <Tokens.Modals />
+        <TokensModals />
         <Account.Modals />
         <P2PModals />
         <SignModals />

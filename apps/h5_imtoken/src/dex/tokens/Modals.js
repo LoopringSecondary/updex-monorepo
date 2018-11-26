@@ -1,10 +1,9 @@
 import React from 'react'
 import {Containers} from 'modules'
 import UiContianers from 'LoopringUI/containers'
-import Receive from './Receive'
+import Receive from 'ui/dex/tokens/Receive'
 import Convert from './ConvertForm'
-import HelperOfEnable from './HelperOfEnable'
-import HelperOfTokenActions from './HelperOfTokenActions'
+import HelperOfTokenActions from 'ui/dex/tokens/HelperOfTokenActions'
 
 function Modals(props) {
   return (
@@ -12,11 +11,6 @@ function Modals(props) {
       <Containers.Layers id="receiveToken">
           <UiContianers.Popups id="receiveToken" style={{height:'100%'}} className="h100">
             <Receive/>
-          </UiContianers.Popups>
-      </Containers.Layers>
-      <Containers.Layers id="helperOfEnable">
-          <UiContianers.Popups id="helperOfEnable">
-            <HelperOfEnable />
           </UiContianers.Popups>
       </Containers.Layers>
       <Containers.Layers id="helperOfTokenActions">

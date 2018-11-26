@@ -2,7 +2,6 @@ import React from 'react'
 import { Redirect, Route, Switch } from 'dva/router'
 import Pages from './pages'
 import Orders from './orders'
-import Tokens from './tokens'
 import Markets from './tickers/Markets'
 import MarketsSearch from './tickers/ListSearchTickers'
 import MarketDetail from './tickers/Detail'
@@ -12,6 +11,7 @@ import UserCenter from './account/UserCenter'
 import ListTodos from './notifications/ListTodos'
 import SettingsModals from './settings/Modals'
 import SignModals from './sign/Modals'
+import TokensModals from './tokens/Modals'
 import storage from 'modules/storage'
 import ScanQrcode from './scan/ScanContainer'
 
@@ -39,12 +39,11 @@ const Logged = (props)=>{
           <Route path={`/dex/placeOrder`} exact component={PlaceOrder} />
           <Route path={`/dex/placeOrder/:market`} exact component={PlaceOrder} />
           <Route path={`/dex/usercenter`} component={UserCenter} />
-          <Route path={`/dex/convert/:token`} component={Convert} />
           <Route path={`/dex/todos`} exact component={ListTodos} />
           <Redirect from="/dex" to= {`/dex/home`} />
         </Switch>
         <Orders.Modals />
-        <Tokens.Modals />
+        <TokensModals />
         <SignModals />
         <SettingsModals />
       </div>
