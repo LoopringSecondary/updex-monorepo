@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'dva/router';
 import intl from 'react-intl-universal';
-import ListMarketTickers from './ListMarketTickers';
+import ListMarketTickers from 'ui/dex/tickers/ListMarketTickers';
 import { NavBar,Icon } from 'antd-mobile';
 import { Icon as WebIcon } from 'antd';
 import routeActions from 'common/utils/routeActions'
