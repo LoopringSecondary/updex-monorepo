@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Icon, InputItem, List, NavBar, Toast,Modal } from 'antd-mobile'
+import { Button, Icon, InputItem, List, NavBar, Toast } from 'antd-mobile'
 import { Icon as WebIcon } from 'antd'
 import { connect } from 'dva'
 import routeActions from 'common/utils/routeActions'
@@ -11,26 +11,14 @@ import intl from 'react-intl-universal'
 import storage from 'modules/storage'
 import Worth from 'modules/settings/Worth'
 import { signTx } from 'common/utils/signUtils'
-import ConvertHelperOfBalance from './ConvertHelperOfBalance'
-import { keccakHash } from 'LoopringJS/common/utils'
-import {generateApproveTx} from "modules/orders/formatters";
+import ConvertHelperOfBalance from 'ui/dex/tokens/ConvertHelperOfBalance'
 
 const WETH = Contracts.WETH
 
 class Convert extends React.Component {
   state = {
     token: 'ETH',
-    loading: false,
-    hash: ''
-  }
-
-  componentWillReceiveProps (newProps) {
-    const {auth} = newProps
-    const {hash} = this.state
-    if (hash === auth.hash && auth.status === 'accept') {
-      Modal.alert(intl.get('notifications.title.convert_suc'))
-      this.setState({hash: ''})
-    }
+    loading:false
   }
 
   componentDidMount () {
@@ -86,17 +74,13 @@ class Convert extends React.Component {
       dispatch({type: 'convert/setMax', payload: {amount: max, amount1: max}})
     }
     const gotoConfirm = async () => {
-      this.setState({loading: true})
-      const _this = this
       if (!isValidNumber(amount)) {
         Toast.info(intl.get('notifications.title.invalid_number'), 1, null, false)
-        this.setState({loading: false})
         return
       }
-      const owner = storage.wallet.getUnlockedAddress()
-      if (owner && ((token.toLowerCase() === 'eth' && toBig(amount).plus(gasFee).gt(assets.balance)) ||(token.toLowerCase() === 'weth' && toBig(amount).gt(assets.balance)))) {
+
+      if ((token.toUpperCase() === 'ETH'&& toBig(amount).plus(gasFee).gt(assets.balance)) || (token.toUpperCase() === 'WETH' && toBig(amount).gt(assets.balance))) {
         Toast.info(intl.get('convert.not_enough_tip', {token}), 1, null, false)
-        this.setState({loading: false})
         return
       }
       let data = ''
@@ -115,16 +99,37 @@ class Convert extends React.Component {
         to,
         gasPrice: toHex(toBig(gasPrice).times(1e9)),
         chainId: config.getChainId(),
-        value
+        value,
+        nonce: toHex((await window.RELAY.account.getNonce(address)).result)
       }
-      if (owner) {
-        tx.nonce = toHex((await window.RELAY.account.getNonce(address)).result)
-      }
-      dispatch({type: 'task/setTask', payload: {task:'signP2P', unsign:{type: 'convert', data:tx}}})
-    }
 
+      signTx(tx).then(res => {
+        if (res.result) {
+          window.ETH.sendRawTransaction(res.result).then(resp => {
+            if (resp.result) {
+              window.RELAY.account.notifyTransactionSubmitted({
+                txHash: resp.result,
+                rawTx: tx,
+                from: address
+              })
+              Toast.success(intl.get('notifications.title.convert_suc'), 3, null, false)
+              hideLayer({id: 'convertToken'})
+              if(convertToken.token){
+                showLayer({id:"notifications"})
+              }else{
+                routeActions.gotoPath('/dex/todos');
+              }
+            } else {
+              Toast.fail(intl.get('notifications.title.convert_fail') + ':' + resp.error.message, 3, null, false)
+            }
+          })
+        } else {
+          Toast.fail(intl.get('notifications.title.convert_fail') + ':' + res.error.message, 3, null, false)
+        }
+      })
+    }
     const amountChange = (value) => {
-      dispatch({type: 'convert/amountChange', payload: {amount: value}})
+      dispatch({type: 'convert/amountChange', payload: {amount:value }})
     }
     const swap = () => {
       const {token} = this.state
@@ -155,7 +160,7 @@ class Convert extends React.Component {
           <div className="p15 ">
             <div className="row ml0 mr0 no-gutters align-items-stretch justify-content-center" style={{}}>
               <div className="col text-right no-border am-list-bg-none">
-                <List className="selectable">
+                <List  className="selectable">
                   <InputItem
                     type="money"
                     onChange={amountChange}
@@ -181,8 +186,7 @@ class Convert extends React.Component {
                 </List>
               </div>
             </div>
-            <Button className="b-block w-100 mt15" size="large" onClick={gotoConfirm} type="primary" loading={loading}
-                    disabled={loading}>
+            <Button className="b-block w-100 mt15" size="large" onClick={gotoConfirm} type="primary" loading={loading} disabled={loading}>
               <div className="row ml0 mr0 no-gutters fs16 align-items-center">
                 <div hidden className="col">{toNumber(tf.toPricisionFixed(toBig(amount)))} <span className="fs14">{fromToken}</span></div>
                 <div className="col fs18" style={{}}>
@@ -200,15 +204,12 @@ class Convert extends React.Component {
   }
 }
 
-function
-
-mapStateToProps (state) {
+function mapStateToProps (state) {
   return {
     balance: state.sockets.balance,
     prices: state.sockets.marketcap.items,
     amount: state.convert.amount,
-    gas: state.gas,
-    auth: state.sockets.circulrNotify.item
+    gas: state.gas
   }
 }
 

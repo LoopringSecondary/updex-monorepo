@@ -9,21 +9,27 @@ import QRCode from 'qrcode.react'
 import {Page, Pages} from 'LoopringUI/components/Pages'
 import {connect} from 'dva'
 import moment from 'moment'
-import {toHex, toFixed, toBig} from 'LoopringJS/common/formatter'
+import {toHex, toFixed, toBig, toNumber} from 'LoopringJS/common/formatter'
 import storage from 'modules/storage'
+import {signOrder, signTx} from 'common/utils/signUtils'
+import eachOfLimit from 'async/eachOfLimit'
 import Worth from 'modules/settings/Worth'
 import {share} from 'common/utils/signUtils'
 import TokenFm from "modules/tokens/TokenFm";
+import QRCodeNode from 'qrcode'
 
 const OrderMetaItem = (props) => {
-  const {label, value,showArrow=false,onClick=()=>{},className=""} = props
+  const {
+    label, value, showArrow = false, onClick = () => {
+    }
+  } = props
   return (
-    <div onClick={onClick} className={`row ml0 mr0 pl15 pr15 pt10 pb10 zb-b-b no-gutters ${className}`}>
-      <div className="col-auto">
+    <div onClick={onClick} className="row ml0 mr0 pl0 pr0 zb-b-b no-gutters" style={{padding: '10px 0px'}}>
+      <div className="col">
         <div className="fs13 color-black-2 text-left">{label}</div>
       </div>
-      <div className="col text-right">
-        <div className="fs13 color-black-1 text-wrap text-right">{value}</div>
+      <div className="col-auto text-right">
+        <div className="fs13 color-black-1 text-wrap text-left">{value}</div>
       </div>
       {
         !!showArrow &&
@@ -97,17 +103,17 @@ function PlaceOrderSteps(props) {
       return
     }
 
-    const errors = tradeInfo.error ? tradeInfo.error.filter(item => item.value.symbol !== 'ETH' ): []
-    if (errors.length>0) {
+    const errors = tradeInfo.error ? tradeInfo.error.filter(item => item.value.symbol !== 'ETH') : []
+    if (errors.length > 0) {
       const item = errors[0]
       Notification.open({
-          message: intl.get('notifications.title.place_order_failed'),
-          description: intl.get('notifications.message.token_required_when_place_order', {
-            required: item.value.required,
-            token: item.value.symbol
-          }),
-          type: 'error',
-        })
+        message: intl.get('notifications.title.place_order_failed'),
+        description: intl.get('notifications.message.token_required_when_place_order', {
+          required: item.value.required,
+          token: item.value.symbol
+        }),
+        type: 'error',
+      })
       dispatch({type: 'p2pOrder/loadingChange', payload: {loading: false}})
       return
     }
@@ -128,7 +134,52 @@ function PlaceOrderSteps(props) {
     }
     try {
       const {order, unsigned} = await orderFormatter.signP2POrder(tradeInfo, (window.Wallet && window.Wallet.address) || storage.wallet.getUnlockedAddress())
-      dispatch({type: 'task/setTask', payload: {task:'signP2P', unsign:unsigned}})
+      const signResult = await signOrder(order)
+      if (signResult.error) {
+        Notification.open({
+          message: intl.get('notifications.title.place_order_failed'),
+          description: signResult.error.message,
+          type: 'error'
+        })
+        return
+      }
+      const signedOrder = {...order, ...signResult.result}
+      signedOrder.powNonce = 100
+      const response = await window.RELAY.order.placeOrder(signedOrder)
+      if (response.error) {
+        Notification.open({
+          message: intl.get('notifications.title.place_order_failed'),
+          description: response.error.message,
+          type: 'error'
+        })
+      } else {
+        dispatch({type: 'p2pOrder/setFetchOrder', payload: {fetchOrder: true}});
+        Notification.open({
+          message: intl.get('notifications.title.place_order_success'),
+          description: intl.get('notifications.title.place_order_success'),
+          type: 'info'
+        })
+
+        signedOrder.orderHash = response.result
+        dispatch({type: 'p2pOrder/loadingChange', payload: {loading: false}})
+        const unsignedOrder = unsigned.find(item => item.type === 'order')
+        storage.orders.storeP2POrder({
+          auth: unsignedOrder.completeOrder.authPrivateKey,
+          hash: signedOrder.orderHash,
+          count
+        })
+        let qrcode = JSON.stringify({
+          type: 'P2P',
+          value: {auth: unsignedOrder.completeOrder.authPrivateKey, hash: signedOrder.orderHash, count}
+        })
+
+        if (storage.wallet.getUnlockedType() === 'imtoken') {
+          const url = window.location.href.split('#')[0].concat('#/auth/imtoken')
+          qrcode = url.concat(`?to=\/dex\/scan&type=P2P&auth=${unsignedOrder.completeOrder.authPrivateKey}&hash=${signedOrder.orderHash}&count=${count}`);
+        }
+        dispatch({type: 'p2pOrder/qrcodeChange', payload: {qrcode}})
+        page.gotoPage({id: 'qrcode'})
+      }
     } catch (e) {
       Notification.open({
         message: intl.get('notifications.title.place_order_failed'),
@@ -139,21 +190,34 @@ function PlaceOrderSteps(props) {
   }
 
   const shareOrder = () => {
-    const content = {type: 'p2pOrder', content: p2pOrder.qrcode}
+    let content;
     const tokensFm = new TokenFm({symbol: tokenS})
     const tokenbFm = new TokenFm({symbol: tokenB})
-    content.extra = {
-      validUntil: validUntil.unix().toString(),
-      amountB: tokenbFm.toPricisionFixed(amountB),
-      amountS: tokensFm.toPricisionFixed(amountS),
-      tokenS,
-      tokenB
+    if (storage.wallet.getUnlockedType() === 'imtoken') {
+      QRCodeNode.toDataURL(p2pOrder.qrcode,function (err, url) {
+        content = {}
+        content.title = intl.get('common.loopring_p2p');
+      //  content.message = `${tokensFm.toPricisionFixed(amountS.div(count))} ${tokenS} => ${tokenbFm.toPricisionFixed(amountB.div(count))} ${tokenB}`;
+        content.url = url
+        content.type='image/png'
+        share(content)
+      })
+    } else {
+      content = {type: 'p2pOrder', content: p2pOrder.qrcode}
+      content.extra = {
+        validUntil: validUntil.unix().toString(),
+        amountB: tokenbFm.toPricisionFixed(amountB),
+        amountS: tokensFm.toPricisionFixed(amountS),
+        tokenS,
+        tokenB
+      }
+      share(content)
     }
-    share(content)
+
   };
 
   return (
-    <div className="bg-white" style={{height:'100%'}}>
+    <div className="bg-white h-100 h100">
       <Pages active="order">
         <Page id="order" render={({page}) =>
           <div>
@@ -173,10 +237,15 @@ function PlaceOrderSteps(props) {
                 {intl.get('p2p_order.order_title')}
               </div>
             </NavBar>
-            <div className="pt15 pb15 bg-white">
-              <div className="pt15 pb30 row ml0 mr0 no-gutters align-items-center justify-content-center zb-b-b">
+            <div className="p15 bg-white">
+              <div className="pb20 row ml0 mr0 no-gutters align-items-center justify-content-center zb-b-b">
                 <div className="col-auto">
-                  <div className="bg-primary color-white d-flex align-items-center justify-content-center circle-40" style={{}}>
+                  <div className="bg-primary-light text-primary d-flex align-items-center justify-content-center"
+                       style={{
+                         width: '4rem',
+                         height: '4rem',
+                         borderRadius: '50em',
+                       }}>
                     <i className={`icon-token-${tokenS} fs24`}/>
                   </div>
                 </div>
@@ -184,32 +253,41 @@ function PlaceOrderSteps(props) {
                   <Icon type="swap" className={`text-primary fs20`}/>
                 </div>
                 <div className="col-auto">
-                  <div className="bg-primary color-white d-flex align-items-center justify-content-center  circle-40" style={{}}>
+                  <div className="bg-primary-light text-primary d-flex align-items-center justify-content-center"
+                       style={{
+                         width: '4rem',
+                         height: '4rem',
+                         borderRadius: '50em',
+                       }}>
                     <i className={`icon-token-${tokenB} fs24`}/>
                   </div>
                 </div>
               </div>
               <OrderMetaItem label={intl.get('common.type')} value={intl.get('p2p_order.user_center_p2p')}/>
               <OrderMetaItem label={intl.get('common.buy')} value={`${amountB} ${tokenB}`}/>
+
+
               <OrderMetaItem label={intl.get('common.sell')} value={`${amountS} ${tokenS}`}/>
-              <OrderMetaItem label={intl.get('common.buy')+' '+intl.get('order.price')} value={
+              {false && <OrderMetaItem label={intl.get('order.price')} value={`${price} ${tokenS}/${tokenB}`}/>}
+              <OrderMetaItem label={intl.get('common.buy') + ' ' + intl.get('order.price')} value={
                 <span>
                   {`1 ${tokenB} = ${Number(price)} ${tokenS} ≈`} <Worth amount={price} symbol={tokenS}/>
                 </span>
               }/>
-              <OrderMetaItem label={intl.get('common.sell')+' '+intl.get('order.price')} value={
+              <OrderMetaItem label={intl.get('common.sell') + ' ' + intl.get('order.price')} value={
                 <span>
-                  {`1 ${tokenS} = ${Number(toFixed(1/price,8))} ${tokenB} ≈`} <Worth amount={1/price} symbol={tokenB}/>
+                  {`1 ${tokenS} = ${Number(toFixed(1 / price, 8))} ${tokenB} ≈`} <Worth amount={1 / price}
+                                                                                        symbol={tokenB}/>
                 </span>
               }/>
-              <OrderMetaItem label={intl.get('common.type')} value={intl.get('p2p_order.user_center_p2p')}/>
               <OrderMetaItem label={intl.get('common.ttl')} showArrow={true}
-                              className="hover-default" onClick={showLayer.bind(this,{id:'helperOfTTL'})} 
-                             value={<div className="text-primary">{`${validSince.format('MM-DD HH:mm')} ~ ${validUntil.format('MM-DD HH:mm')}`}</div>}/>
+                             value={<div onClick={showLayer.bind(this, {id: 'helperOfTTL'})}
+                                         className="text-primary">{`${validSince.format('MM-DD HH:mm')} ~ ${validUntil.format('MM-DD HH:mm')}`}</div>}/>
               <OrderMetaItem label={intl.get('p2p_order.count')} showArrow={true}
-                            className="hover-default" onClick={showLayer.bind(this,{id:'helperOfMiniFill'})}
-                             value={<div  className="text-primary cursor-pointer pl40"><span className="mr5">{count}</span></div>}/>
-              <Button type="primary" className="m15" onClick={next.bind(this, page)}>{intl.get('place_order_confirm.sign_and_submit')}</Button>
+                             value={<div onClick={showLayer.bind(this, {id: 'helperOfMiniFill'})}
+                                         className="text-primary"><span className="mr5">{count}</span></div>}/>
+              <Button type="primary" className="mt15"
+                      onClick={next.bind(this, page)}>{intl.get('place_order_confirm.sign_and_submit')}</Button>
             </div>
           </div>
         }/>
@@ -234,10 +312,15 @@ function PlaceOrderSteps(props) {
             <div className="zb-b-t p15 mt15">
               <OrderMetaItem label={intl.get('common.buy')} value={`${amountB} ${tokenB}`}/>
               <OrderMetaItem label={intl.get('common.sell')} value={`${amountS} ${tokenS}`}/>
-              <OrderMetaItem label={intl.get('common.buy')+' '+intl.get('order.price')} value={<span>{`1 ${tokenB} = ${Number(price)} ${tokenS} ≈`} <Worth amount={price} symbol={tokenS}/></span>} />
-              <OrderMetaItem label={intl.get('common.sell')+' '+intl.get('order.price')} value={
+              <OrderMetaItem label={intl.get('common.buy') + ' ' + intl.get('order.price')} value={
                 <span>
-                  {`1 ${tokenS} = ${Number(toFixed(1/price,8))} ${tokenB} ≈`} <Worth amount={1/price} symbol={tokenB}/>
+                  {`1 ${tokenB} = ${Number(price)} ${tokenS} ≈`} <Worth amount={price} symbol={tokenS}/>
+                </span>
+              }/>
+              <OrderMetaItem label={intl.get('common.sell') + ' ' + intl.get('order.price')} value={
+                <span>
+                  {`1 ${tokenS} = ${Number(toFixed(1 / price, 8))} ${tokenB} ≈`} <Worth amount={1 / price}
+                                                                                        symbol={tokenB}/>
                 </span>
               }/>
             </div>

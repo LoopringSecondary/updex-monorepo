@@ -4,11 +4,10 @@ import storage from 'modules/storage'
 import Face2FacePage from './Face2FacePage'
 import Face2FaceModals from './Modals'
 import TokenModals from '../dex/tokens/Modals'
-
 import NotificationsModals from '../dex/notifications/Modals'
 
 const Logged = (props)=>{
-  const isLogged = true
+  const isLogged = !!(storage.wallet.getUnlockedAddress())
   if(isLogged){
     return (
       <div>
@@ -21,6 +20,8 @@ const Logged = (props)=>{
       </div>
     )
   }else{
+    // props.history.push(null,'/auth',{to:'/face2face'})
+    return <Redirect to="/auth/tpwallet?to=/face2face" />
   }
 }
 
@@ -33,11 +34,9 @@ export default class Routes extends React.Component {
     // const {url} = match;
     const url = ""
     return (
-      <div>
-        <Switch>
-          <Route path={`/face2face`}  component={Logged} />
-        </Switch>
-      </div>
+      <Switch>
+        <Route path={`/face2face`}  component={Logged} />
+      </Switch>
     );
   }
 }

@@ -4,11 +4,11 @@ export default {
   extraBabelIncludes:[
     path.resolve(__dirname, '../../packages'),
   ],
-	"extraBabelPlugins": [
+  "extraBabelPlugins": [
     // ["import", { "libraryName": "antd-mobile", "libraryDirectory": "es", "style": true },'antd-mobile'],
     ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": true },'antd'],
     // ["@babel/transform-runtime",{regenerator:true}],
-	],
+  ],
   hash:true,
   // multipage:true,
   // entry:'./src/assets/css/themes/*.less',
@@ -24,7 +24,7 @@ export default {
   // extraBabelPresets: ["@babel/env",'@babel/react'],
   disableCSSModules: true,
   
-	"alias":{
+  "alias":{
     // "LoopringJS":`loopring.js/lib`,
     "LoopringJS":path.resolve(__dirname, './node_modules/loopring.js/lib'),
     "LoopringUI":path.resolve(__dirname, '../../packages/common/loopringui'),
@@ -37,7 +37,7 @@ export default {
     // "mobile":`${__dirname}/src/dex`,
     "mobile":path.resolve(__dirname, './src/dex'),
     "root":path.resolve(__dirname, './'),
-	},
+  },
   extraResolveModules:[path.resolve(__dirname, './node_modules/'),path.resolve(__dirname, '../../packages'),],
   "theme": {
     // "@font-family-no-number"  : "Roboto ,PingFang SC",

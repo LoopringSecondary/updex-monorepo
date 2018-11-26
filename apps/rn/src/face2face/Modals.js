@@ -1,75 +1,74 @@
 import React from 'react'
 import Containers from 'modules/containers'
 import UiContainers from 'LoopringUI/containers'
-import HelperOfTokens from './HelperOfTokens'
-import HelperOfTTL from 'mobile/orders/HelperOfTTL'
-import HelperOfMiniFill from './HelperOfMiniFill'
-import HelperOfAmount from './HelperOfAmount'
-import HelperOfFAQ from './HelperOfFAQ'
-import HelperOfPrice from './HelperOfPrice'
+import HelperOfTokens from 'ui/face2face/HelperOfTokens'
+import HelperOfTTL from 'ui/dex/orders/HelperOfTTL'
+import HelperOfMiniFill from 'ui/face2face/HelperOfMiniFill'
+import HelperOfAmount from 'ui/face2face/HelperOfAmount'
+import HelperOfFAQ from 'ui/face2face/HelperOfFAQ'
+import HelperOfPrice from 'ui/face2face/HelperOfPrice'
+import OrderDetail from 'ui/face2face/Detail'
 import Face2FaceConfirm from './Face2FaceConfirm'
-import OrderDetail from './Detail'
 import OrderQrcode from './Qrcode'
 import TakerConfirm from './TakerConfirm'
-import Face2FacePage from './Face2FacePage'
-
+import SignOrderAndTxs from './SignOrderAndTxs'
 
 function Modals(props) {
   return (
     <div>
-      <Containers.Layers id="p2p">
-        <UiContainers.Drawer maskClosable={false} position="right" id="p2p" className="h-100" style={{height:'100%',margin:'0 auto'}}>
-          <Face2FacePage />
-        </UiContainers.Drawer>
-      </Containers.Layers>
       <Containers.Layers id="p2pOrderDetail">
-        <UiContainers.Popups id="p2pOrderDetail" position="right" className="h-100" style={{height:'100%',margin:'0 auto'}}>
+        <UiContainers.Popups id="p2pOrderDetail" className="h100" style={{height:'100%'}}>
           <OrderDetail />
         </UiContainers.Popups>
       </Containers.Layers>
       <Containers.Layers id="helperOfTokens">
-        <UiContainers.Popups id="helperOfTokens" position="right" className="" style={{height:'100%',margin:'0 auto'}}>
+        <UiContainers.Popups id="helperOfTokens">
           <HelperOfTokens />
         </UiContainers.Popups>
       </Containers.Layers>
       <Containers.Layers id="face2FaceConfirm">
-        <UiContainers.Popups id="face2FaceConfirm" position="right" className="h-100" style={{height:'100%',margin:'0 auto'}}>
+        <UiContainers.Popups id="face2FaceConfirm" className="h100" style={{height:'100%'}}>
           <Face2FaceConfirm />
         </UiContainers.Popups>
       </Containers.Layers>
       <Containers.Layers id="takerConfirm">
-        <UiContainers.Popups id="takerConfirm" position="right" className="h-100" style={{height:'100%',margin:'0 auto'}} >
+        <UiContainers.Popups id="takerConfirm" className="h-100" style={{height:'100%'}} >
           <TakerConfirm />
         </UiContainers.Popups>
       </Containers.Layers>
       <Containers.Layers id="orderQrcode">
-        <UiContainers.Popups id="orderQrcode" zIndex={1091} position="right" className="h-100" style={{height:'100%',margin:'0 auto'}}>
+        <UiContainers.Popups id="orderQrcode" className="h-100" style={{height:'100%'}}>
           <OrderQrcode/>
         </UiContainers.Popups>
       </Containers.Layers>
       <Containers.Layers id="helperOfTTL">
-        <UiContainers.Popups id="helperOfTTL" zIndex={1091} position="right" className="" style={{height:'100%',margin:'0 auto'}}>
+        <UiContainers.Popups id="helperOfTTL" className="" style={{}}>
           <HelperOfTTL />
         </UiContainers.Popups>
       </Containers.Layers>
       <Containers.Layers id="helperOfMiniFill">
-        <UiContainers.Popups id="helperOfMiniFill" position="right" className="" style={{height:'100%',margin:'0 auto'}}>
+        <UiContainers.Popups id="helperOfMiniFill" className="" style={{}}>
           <HelperOfMiniFill />
         </UiContainers.Popups>
       </Containers.Layers>
       <Containers.Layers id="helperOfFAQ">
-        <UiContainers.Popups id="helperOfFAQ" position="right" className="h-100" style={{height:'100%',margin:'0 auto'}}>
+        <UiContainers.Popups id="helperOfFAQ" className="h-100" style={{height:'100%'}}>
           <HelperOfFAQ />
         </UiContainers.Popups>
       </Containers.Layers>
       <Containers.Layers id="helperOfPrice">
-        <UiContainers.Popups id="helperOfPrice" position="right" className="" style={{height:'100%',margin:'0 auto'}}>
+        <UiContainers.Popups id="helperOfPrice" className="h-100" style={{height:'100%'}}>
           <HelperOfPrice />
         </UiContainers.Popups>
       </Containers.Layers>
-      <Containers.Layers id="helperOfAmountOfP2P">
-        <UiContainers.Popups id="helperOfAmountOfP2P" alias="helperOfAmount" position="right" className="" style={{height:'100%',margin:'0 auto'}}>
+      <Containers.Layers id="helperOfAmount">
+        <UiContainers.Popups id="helperOfAmount">
           <HelperOfAmount />
+        </UiContainers.Popups>
+      </Containers.Layers>
+      <Containers.Layers id="helperOfSign">
+        <UiContainers.Popups id="helperOfSign">
+          <SignOrderAndTxs />
         </UiContainers.Popups>
       </Containers.Layers>
     </div>

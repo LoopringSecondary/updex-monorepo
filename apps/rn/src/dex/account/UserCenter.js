@@ -5,14 +5,14 @@ import { Icon as WebIcon } from 'antd'
 import { Link, Redirect, Route, Switch } from 'dva/router'
 import Containers from 'modules/containers'
 import routeActions from 'common/utils/routeActions'
-import LayoutDexHome from '../../layout/LayoutDexHome'
+import LayoutDexHome from 'ui/layout/LayoutDexHome'
 import { OpenOrderList, PullRefreshOrders } from '../orders/ListOrders'
-import ListBalance from '../tokens/ListBalance'
-import ListMyFills from '../fills/ListMyFills'
+import ListBalance from 'ui/dex/tokens/ListBalance'
+import ListMyFills from 'ui/dex/fills/ListMyFills'
 import { getShortAddress } from 'modules/formatter/common'
 import storage from 'modules/storage'
 import intl from 'react-intl-universal'
-import NumberOfTodos from '../notifications/NumberOfTodos'
+import NumberOfTodos from 'ui/dex/notifications/NumberOfTodos'
 
 class UserCenter extends React.Component {
   render() {
@@ -49,7 +49,7 @@ class UserCenter extends React.Component {
         <div className="0">
           <div className="bg-white position-fixed w-100" style={{zIndex:'1000'}}>
             <NavBar
-                className="zb-b-b" 
+                className="" 
                 mode="light"
                 onLeftClick={showNotification}
                 leftContent={[
@@ -63,6 +63,7 @@ class UserCenter extends React.Component {
                 {intl.get('usercenter.page_title')}
               </div>
             </NavBar>
+            <div className="divider 1px zb-b-b"></div>
           </div>
           <div className="pt40 bg-white"></div>
           <div className="bg-white pt30 pb30 text-center">

@@ -7,7 +7,6 @@
     "deploy-gh-pages": "gh-pages -d dist",
     "lint": "eslint --ext .js src test"
   },
-  "theme": "./theme.js",
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "antd": "3.10.4",
@@ -16,15 +15,15 @@
     "copy-to-clipboard": "3.0.8",
     "dva": "2.4.1",
     "lodash": "4.17.5",
-    "loopring.js": "2.0.11",
+    "loopring.js": "2.0.12",
     "moment": "2.20.1",
+    "qrcode": "^1.3.2",
     "qrcode.react": "0.7.2",
     "react": "16.3.0",
     "react-dom": "16.3.0",
     "react-helmet": "^5.2.0",
-    "react-responsive": "^6.0.1",
     "react-intl-universal": "1.11.2",
-    "request": "2.85.0",
+    "react-responsive": "^6.0.1",
     "socket.io-client": "2.0.4",
     "useragent.js": "0.5.6",
     "uuid": "3.3.2"
@@ -32,6 +31,7 @@
   "devDependencies": {
     "babel-plugin-dva-hmr": "0.4.1",
     "babel-plugin-import": "1.7.0",
+    "babel-preset-es2015": "6.24.1",
     "eslint": "4.14.0",
     "eslint-config-umi": "0.1.1",
     "eslint-plugin-flowtype": "2.34.1",

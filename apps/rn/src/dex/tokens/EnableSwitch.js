@@ -16,17 +16,16 @@ import intl from 'react-intl-universal'
 
 class EnableSwitch extends React.Component {
   render() {
-    const {symbol, size = "small", balances,pendingTx,dispatch} = this.props
+    const {symbol, size = "small", balances,pendingTx} = this.props
     const balance  = balances.find(item =>item.symbol.toLowerCase() === symbol.toLowerCase())
     const tokenFm = new TokenFormatter({symbol})
     const loading = !!isApproving(pendingTx.items, symbol)
-    const pendingAllowance = toBig(loading ? tokenFm.getUnitAmount(isApproving(pendingTx.items, symbol)) : balance ? balance.allowance : toBig(0))
+    const pendingAllowance = toBig(loading ? tokenFm.getUnitAmount(isApproving(pendingTx.items, symbol)) : (balance ? balance.allowance : toBig(0)))
 
-    const onChange = async (checked,e) => {
-      console.log('EnableSwitch',e)
+    const onChange = async (checked) => {
       if (checked) {
         Modal.alert(`${intl.get('todo_list.actions_enable')} ${symbol}`,intl.get('token_actions.enable_tip',{token:symbol}),[
-          { text: intl.get('common.cancel'), onPress: () => console.log('cancel') },
+          { text: intl.get('common.cancel'), onPress: () =>{} },
           { text: intl.get('common.ok'), onPress: async () =>{
               const txs = []
               const {gas} = this.props;
@@ -42,23 +41,50 @@ class EnableSwitch extends React.Component {
                 to: config.getTokenBySymbol(symbol).address
               }
               if (pendingAllowance.gt(0)) {
-                txs.push({type:'approveZero',data:{...tx, nonce,data:Contracts.ERC20Token.encodeInputs('approve', {_spender: config.getDelegateAddress(), _value:"0x0"})}})
+                txs.push({...tx, nonce,data:Contracts.ERC20Token.encodeInputs('approve', {_spender: config.getDelegateAddress(), _value:"0x0"})})
                 nonce = toHex(toNumber(nonce) +1)
               }
-              txs.push({type:'approve',data:{...tx,nonce,data:Contracts.ERC20Token.encodeInputs('approve', {_spender: config.getDelegateAddress(), _value:"0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"})}})
-              dispatch({type: 'task/setTask', payload: {task:'sign', unsign:txs}})
-            }},
+              txs.push({...tx,nonce,data:Contracts.ERC20Token.encodeInputs('approve', {_spender: config.getDelegateAddress(), _value:"0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"})})
+              eachOfLimit(txs, 1, async (item, key, callback) => {
+                signTx(item).then(res => {
+                  if (res.result) {
+                    window.ETH.sendRawTransaction(res.result).then(resp => {
+                      if (resp.result) {
+                        window.RELAY.account.notifyTransactionSubmitted({
+                          txHash: resp.result,
+                          rawTx: item,
+                          from: address
+                        })
+                        callback()
+                      } else {
+                        callback(resp.error)
+                      }
+                    })
+                  } else {
+                    callback(res.error)
+                  }
+                })
+              }, async function (e) {
+                if(!e){
+                  Notification.open({
+                    description:intl.get('notifications.message.tx_submit_suc') + `(${intl.get('notifications.message.tx_pending')})`,
+                    type: 'success',
+                  })
+                }else{
+                  Notification.open({
+                    description:intl.get('notifications.title.enable_fail') + e.message,
+                    type: 'error',
+                  })
+                }
+              })
+            } },
         ])
 
       }
     };
     if(balance){
       if(toBig(balance.allowance).lt(1e8)){
-        return (
-          <span onClick={(e)=>{ e.preventDefault();e.stopPropagation() }}>
-            <Switch size={size} onChange={onChange} checked = {pendingAllowance.gt(1e8)}  loading={loading && pendingAllowance.gt(1e8)} disabled={pendingAllowance.gt(1e8)}/>  
-          </span>
-        )
+        return <Switch size={size} onChange={onChange} checked={pendingAllowance.gt(1e8)}  loading={loading && pendingAllowance.gt(1e8)} disabled={pendingAllowance.gt(1e8)}/>
       }else{
         return <Icon type="check-circle" theme="filled" className="color-success"/>
       }

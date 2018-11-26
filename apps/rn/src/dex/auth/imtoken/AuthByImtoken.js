@@ -6,10 +6,11 @@ import routeActions from 'common/utils/routeActions'
 import { connect } from 'dva'
 import storage from 'modules/storage'
 import intl from 'react-intl-universal'
+import {setLocale} from "common/utils/localeSetting";
 
 class AuthByImtoken extends React.Component {
 
-  componentDidMount () {
+  componentWillMount () {
     const _props = this.props
     const address = storage.wallet.getUnlockedAddress()
     if (address) {
@@ -31,7 +32,18 @@ class AuthByImtoken extends React.Component {
         })
         _props.dispatch({type: 'locales/setLocale', payload: {locale: window.Wallet.language}})
         Toast.hide()
-        routeActions.gotoPath('/dex')
+        let to = routeActions.location.getQueryByName(this.props,'to');
+        if (to) {
+          let search = _props.location.search.substr(1);
+          const params = search.split("&").filter(item => item.indexOf("to=" + to) === -1)
+          if (params.length > 0) {
+            routeActions.gotoPath(to.concat("?").concat(params.join("&")))
+          } else {
+            routeActions.gotoPath(to)
+          }
+        } else {
+          routeActions.gotoPath('/dex'.concat(_props.location.search))
+        }
       }
       // Modal.alert('handler start :imtoken not exsits')
       // window.addEventListener('sdkReady', handler)
@@ -43,9 +55,9 @@ class AuthByImtoken extends React.Component {
         }
       }, 1000)
     } else {
-      const location = _props.location
-      const language = location.search.replace(`?locale=`, '')
-      _props.dispatch({type: 'locales/setLocale', payload: {locale: language}})
+      const language = routeActions.location.getQueryByName(_props, 'locale')
+      // _props.dispatch({type: 'locales/setLocale', payload: {locale: language}})
+      setLocale(language)
     }
   }
 
@@ -68,7 +80,18 @@ class AuthByImtoken extends React.Component {
         _props.dispatch({type: 'sockets/unlocked'})
         _props.dispatch({type: 'locales/setLocale', payload: {locale: window.Wallet.language}})
         Toast.hide()
-        routeActions.gotoPath('/dex')
+        let to = routeActions.location.getQueryByName(this.props,'to');
+        if (to) {
+          let search = _props.location.search.substr(1);
+          const params = search.split("&").filter(item => item.indexOf("to=" + to) === -1)
+          if (params.length > 0) {
+            routeActions.gotoPath(to.concat("?").concat(params.join("&")))
+          } else {
+            routeActions.gotoPath(to)
+          }
+        } else {
+          routeActions.gotoPath('/dex'.concat(_props.location.search))
+        }
       })
     } else {
       window.addEventListener('sdkReady', function () {
@@ -85,7 +108,18 @@ class AuthByImtoken extends React.Component {
           _props.dispatch({type: 'sockets/unlocked'})
           _props.dispatch({type: 'locales/setLocale', payload: {locale: window.Wallet.language}})
           Toast.hide()
-          routeActions.gotoPath('/dex')
+          let to = routeActions.location.getQueryByName(this.props,'to');
+          if (to) {
+            let search = _props.location.search.substr(1);
+            const params = search.split("&").filter(item => item.indexOf("to=" + to) === -1)
+            if (params.length > 0) {
+              routeActions.gotoPath(to.concat("?").concat(params.join("&")))
+            } else {
+              routeActions.gotoPath(to)
+            }
+          } else {
+            routeActions.gotoPath('/dex'.concat(_props.location.search))
+          }
         })
       })
     }

@@ -4,7 +4,6 @@ import intl from 'react-intl-universal'
 import routeActions from 'common/utils/routeActions'
 import { Button, Icon, NavBar, NoticeBar, SegmentedControl, Modal, Toast } from 'antd-mobile'
 import { Icon as WebIcon } from 'antd'
-import LayoutDexHome from '../../layout/LayoutDexHome'
 import { toBig, toHex, toNumber } from 'LoopringJS/common/formatter'
 import TokenFormatter, { getBalanceBySymbol } from 'modules/tokens/TokenFm'
 import config from 'common/config'
@@ -162,7 +161,7 @@ const TodoItem = (props) => {
       <div className="">
         <div className="row ml0 mr0 pl10 pr10 pt15 align-items-center no-gutters" onClick={() => {}}>
           <div className="col-auo pr15 color-black text-center">
-            <WebIcon className="color-error fs16" type="exclamation-circle" theme="filled"/>
+            <WebIcon className="color-error fs16" type="exclamation-circle"/>
           </div>
           <div className="col text-left">
             <div>
@@ -239,9 +238,9 @@ function ListTodos (props) {
         const assets = getBalanceBySymbol({balances: balance.items, symbol: symbol, toUnit: true})
         const unitBalance = assets.balance
         let selling = tf.getUnitAmount(value)
-        if (symbol.toUpperCase() === 'LRC') {
-          selling = toNumber(selling) + toNumber(tf.getUnitAmount(lrcFee))
-        }
+        // if (symbol.toUpperCase() === 'LRC') {
+        //   selling = toNumber(selling) + toNumber(tf.getUnitAmount(lrcFee))
+        // }
         if (toNumber(unitBalance) < toNumber(selling)) {
           data.push({
             symbol: symbol,
@@ -383,3 +382,4 @@ function mapStateToProps (state) {
 }
 
 export default connect(mapStateToProps)(ListTodos)
+

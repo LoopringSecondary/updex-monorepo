@@ -6,8 +6,6 @@ import { getBalanceBySymbol, isValidNumber } from 'modules/tokens/TokenFm'
 import { getDisplaySymbol, toBig, toFixed, toHex ,toNumber} from 'LoopringJS/common/formatter'
 import intl from 'react-intl-universal'
 import Worth from 'modules/settings/Worth'
-import TokenFm from 'modules/tokens/TokenFm'
-import config from 'common/config'
 import {p2pVerification} from 'modules/orders/formatters'
 import moment from 'moment'
 
@@ -113,37 +111,36 @@ class Face2FaceForm extends React.Component {
       <div className="">
         <div className="zb-b-b p15 ">
           <div className="row ml0 mr0 no-gutters align-items-center justify-content-center">
-            <div onClick={showLayer.bind(this,{id:"helperOfTokens",side:'sell'})} className="col center-center cursor-pointer">
+            <div onClick={showLayer.bind(this,{id:"helperOfTokens",side:'sell'})} className="col d-flex justify-content-center align-items-center">
               <span hidden className="mr10 text-primary fs14">{p2pOrder.tokenS}</span>
-              <div className="bg-primary color-white circle-40 center-center hover-bg-primary">
+              <div className="bg-primary-light text-primary d-flex justify-content-center align-items-center" style={{width:"40px",height:'40px',borderRadius:'50em'}}>
                 <i className={`icon-token-${p2pOrder.tokenS} fs24`}/>
               </div>
             </div>
-            <div onClick={()=>dispatch({type:'p2pOrder/swap'})} className="col-auto text-center cursor-pointer w-35">
-              <div className="circle-35 hover-bg-primary center-center">
-                <WebIcon type="swap" className={`text-primary fs18`} />
-              </div>
+            <div onClick={()=>dispatch({type:'p2pOrder/swap'})} className="col-auto text-center" style={{width:'30px'}}>
+              <WebIcon type="swap" className={`text-primary fs18`} />
             </div>
-            <div onClick={showLayer.bind(this,{id:"helperOfTokens",side:'buy'})} className="col center-center cursor-pointer">
-              <div className="bg-primary color-white circle-40 center-center hover-bg-primary">
+            <div onClick={showLayer.bind(this,{id:"helperOfTokens",side:'buy'})} className="col d-flex justify-content-center align-items-center">
+              <div className="bg-primary-light text-primary d-flex justify-content-center align-items-center" style={{width:"40px",height:'40px',borderRadius:'50em'}}>
                 <i className={`icon-token-${p2pOrder.tokenB}  fs24`}/>
               </div>
               <span hidden className="ml10 text-primary fs14">{p2pOrder.tokenB}</span>
             </div>
           </div>
-          <div className="row ml0 mr0 mt15 no-gutters center-center" style={{}}>
-            <div className="col no-border am-list-bg-none">
-              <List  className="selectable text-left">
+          <div className="row ml0 mr0 mt15 no-gutters align-items-stretch justify-content-center" style={{}}>
+            <div className="col text-right no-border am-list-bg-none">
+              <List  className="selectable">
                 <InputItem
-                  type="text"
+                  type="money"
                   onChange={amountChange.bind(this, 'sell')}
-                  value={amountS}
+                  moneyKeyboardAlign="left"
+                   value={amountS}
                   extra={
-                    <div className="fs14 cursor-pointer zb-b-l color-black-1 center-center w-80 hover-bg-primary" style={{textAlign:'justify',position:'absolute',right:0,top:'0',bottom:'0',margin:'auto'}} >
+                    <div className="fs14 cursor-pointer zb-b-l color-black-1 d-flex align-items-center justify-content-center w-75" style={{textAlign:'justify',position:'absolute',right:0,top:'0',bottom:'0',margin:'auto'}} >
                       <div onClick={showLayer.bind(this,{id:"helperOfTokens",side:'sell'})} >
                         {p2pOrder.tokenS} <WebIcon className="fs12" type="caret-down" style={{marginLeft:'0.2rem'}}/>
                       </div>
-                      <div onClick={showLayer.bind(this,{id:"helperOfAmountOfP2P",symbol:p2pOrder.tokenS})}  className="fs16 text-primary w-35" style={{position:'absolute',marginLeft:'-100%'}}>
+                      <div onClick={showLayer.bind(this,{id:"helperOfAmount",symbol:p2pOrder.tokenS})}  className="fs16 text-primary" style={{position:'absolute',marginLeft:'-100%'}}>
                         <WebIcon type="sliders" />
                       </div>
                     </div>
@@ -156,11 +153,12 @@ class Face2FaceForm extends React.Component {
                   </div>
                 </InputItem>
                 <InputItem
-                  type="text"
+                  type="money"
                   onChange={amountChange.bind(this, 'buy')}
+                  moneyKeyboardAlign="left"
                   value={amountB}
                   extra={
-                    <div onClick={showLayer.bind(this,{id:"helperOfTokens",side:'buy'})} className="fs14 cursor-pointer text-justify zb-b-l color-black-1 center-center w-80 hover-bg-primary" style={{textAlign:'justify',position:'absolute',right:0,top:'0',bottom:'0',margin:'auto'}} >
+                    <div onClick={showLayer.bind(this,{id:"helperOfTokens",side:'buy'})} className="fs14 cursor-pointer text-justify zb-b-l color-black-1 d-flex align-items-center justify-content-center w-75" style={{textAlign:'justify',position:'absolute',right:0,top:'0',bottom:'0',margin:'auto'}} >
                         {p2pOrder.tokenB}
                         <WebIcon className="fs12" type="caret-down" style={{marginLeft:'0.2rem'}}/>
                     </div>
@@ -177,7 +175,7 @@ class Face2FaceForm extends React.Component {
                   arrow={false}
                   onClick={()=>showLayer({id:'helperOfPrice'})}
                   extra={
-                   <div className="fs14 color-black-2 cursor-pointer center-center">
+                   <div className="fs14 color-black-1 cursor-pointer d-flex align-items-center justify-content-center">
                     { price >0 && <span>
                       1 {p2pOrder.tokenS} = {`${toNumber(toFixed(1/price,8))} ${p2pOrder.tokenB}`} ≈ <Worth amount={1/price} symbol={p2pOrder.tokenB}/>
                       </span>
@@ -197,7 +195,7 @@ class Face2FaceForm extends React.Component {
               </List>
             </div>
           </div>
-          <Button className="mt15"  onClick={submitOrder} type="primary" disabled={this.state.submitLoading}>{intl.get('common.exchange')}</Button>
+          <Button className="mt15" onClick={submitOrder} type="primary" disabled={this.state.submitLoading}>{intl.get('common.exchange')}</Button>
         </div>
       </div>
     );

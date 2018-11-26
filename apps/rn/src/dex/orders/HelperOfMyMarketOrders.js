@@ -12,7 +12,6 @@ import storage from 'modules/storage'
 import { signMessage } from 'common/utils/signUtils'
 import TokenFm from 'modules/tokens/TokenFm'
 import routeActions from 'common/utils/routeActions'
-import Devices from 'LoopringUI/responsives/Devices'
 
 const HelperOfMyOrders = ({orders = {}, dispatch}) => {
   const market = orders.filters.market
@@ -53,15 +52,6 @@ const HelperOfMyOrders = ({orders = {}, dispatch}) => {
       }
     })
   }
-  const showLayer = (payload) => {
-    dispatch({
-      type: 'layers/showLayer',
-      payload: {
-        ...payload
-      }
-    })
-  }
-
   const cancelOrder = (item, e) => {
     e.stopPropagation()
     const tokenb = item.originalOrder.tokenB
@@ -79,9 +69,25 @@ const HelperOfMyOrders = ({orders = {}, dispatch}) => {
       {text: intl.get('order_cancel.confirm_no'), onPress: () => {}, style: 'default'},
       {
         text: intl.get('order_cancel.confirm_yes'), onPress: () => {
-          const data = {type:1, orderHash:item.originalOrder.hash, timestamp:Math.floor(moment().valueOf() / 1e3).toString(), owner:storage.wallet.getUnlockedAddress()}
-          const unsign = [{type:'cancelOrder', data}]
-          dispatch({type: 'task/setTask', payload: {task:'cancelOrder', unsign}})
+          const timestamp = Math.floor(moment().valueOf() / 1e3).toString()
+          signMessage(timestamp).then(res => {
+            if (res.result) {
+              const sig = res.result
+              window.RELAY.order.cancelOrder({
+                sign: {...sig, timestamp, owner: storage.wallet.getUnlockedAddress()},
+                orderHash:item.originalOrder.hash,
+                type:1
+              }).then(response => {
+                if (response.error) {
+                  Toast.fail(`${intl.get('notifications.title.cancel_fail',{type:intl.get('common.order')})}:${response.error.message}`, 3, null, false)
+                } else {
+                  Toast.success(intl.get('notifications.title.cancel_suc',{type:intl.get('common.order')}), 3, null, false)
+                }
+              })
+            } else {
+              Toast.fail(`${intl.get('notifications.title.cancel_fail',{type:intl.get('common.order')})}:${res.error.message}`, 3, null, false)
+            }
+          })
         }
       },
     ])
@@ -94,12 +100,29 @@ const HelperOfMyOrders = ({orders = {}, dispatch}) => {
         {text: intl.get('order_cancel.confirm_no'), onPress: () => {}, style: 'default'},
         {
           text: intl.get('order_cancel.confirm_yes'), onPress: () => {
-            const tokens = market.split('-')
-            const tokenS = config.getTokenBySymbol(tokens[0]).address
-            const tokenB = config.getTokenBySymbol(tokens[1]).address
-            const data = {type:4, tokenS, tokenB, timestamp:Math.floor(moment().valueOf() / 1e3).toString(), owner:storage.wallet.getUnlockedAddress()}
-            const unsign = [{type:'cancelOrder', data}]
-            dispatch({type: 'task/setTask', payload: {task:'cancelOrder', unsign}})
+            const timestamp = Math.floor(moment().valueOf() / 1e3).toString()
+            signMessage(timestamp).then(res => {
+              if (res.result) {
+                const sig = res.result
+                const tokens = market.split('-')
+                const tokenS = config.getTokenBySymbol(tokens[0]).address
+                const tokenB = config.getTokenBySymbol(tokens[1]).address
+                window.RELAY.order.cancelOrder({
+                  sign: {...sig, timestamp, owner: storage.wallet.getUnlockedAddress()},
+                  type:4,
+                  tokenS,
+                  tokenB
+                }).then(response => {
+                  if (response.error) {
+                    Toast.fail(`${intl.get('notifications.title.cancel_fail',{type:intl.get('common.order')})}:${response.error.message}`, 3, null, false)
+                  } else {
+                    Toast.success(intl.get('notifications.title.cancel_suc',{type:intl.get('common.order')}), 3, null, false)
+                  }
+                })
+              } else {
+                Toast.fail(`${intl.get('notifications.title.cancel_fail',{type:intl.get('common.order')})}:${res.error.message}`, 3, null, false)
+              }
+            })
           }
         },
       ])
@@ -109,7 +132,7 @@ const HelperOfMyOrders = ({orders = {}, dispatch}) => {
   }
   const orderStatus = (item) => {
     if (item.status === 'ORDER_OPENED' || item.status === 'ORDER_WAIT_SUBMIT_RING') {
-      return <Button onClick={cancelOrder.bind(this, item)} type="ghost" style={{height:'24px',lineHeight:'24px'}} className="d-inline-block ml5 bg-primary-light text-primary border-none fs12" size="small">{intl.get('common.cancel')}</Button>
+      return <Button onClick={cancelOrder.bind(this, item)} type="primary" style={{height:'24px',lineHeight:'24px'}} className="d-inline-block ml5" size="small">{intl.get('common.cancel')}</Button>
     }
 
     if (item.status === 'ORDER_FINISHED') {
@@ -165,22 +188,22 @@ const HelperOfMyOrders = ({orders = {}, dispatch}) => {
       <table className="w-100 fs12" style={{overflow: 'auto'}}>
         <thead>
         <tr className="">
-          <th className="text-left pt5 pb5 pl10 pr5 font-weight-normal color-black-4 zb-b-b">
+          <th className="text-left pt10 pb10 pl10 pr5 font-weight-normal color-black-4 zb-b-b">
             {intl.get("common.side")}
             <span hidden className="color-black-4 ml5 fs10">{tokens.right}</span>
           </th>
-          <th className="text-left pt5 pb5 pl5 pr5 font-weight-normal color-black-4 zb-b-b">
-            {intl.get("common.price")}/{tokens.right}
+          <th className="text-left pt10 pb10 pl5 pr5 font-weight-normal color-black-4 zb-b-b">
+            {intl.get("common.price")}<span className="fs10"> / {tokens.right}</span>
           </th>
-          <th className="text-left pt5 pb5 pl5 pr5 font-weight-normal color-black-4 zb-b-b">
-            {intl.get("common.amount")}/{tokens.left}
+          <th className="text-left pt10 pb10 pl5 pr5 font-weight-normal color-black-4 zb-b-b">
+            {intl.get("common.amount")}<span className="fs10"> / {tokens.left}</span>
           </th>
-          <th hidden className="text-right pt5 pb5 pl5 pr5 font-weight-normal color-black-4 zb-b-b">Fee</th>
-          <th className="text-left pt5 pb5 pl5 pr5 font-weight-normal color-black-4 zb-b-b">{intl.get('order.filled')}</th>
+          <th hidden className="text-right pt10 pb10 pl5 pr5 font-weight-normal color-black-4 zb-b-b">Fee</th>
+          <th className="text-left pt10 pb10 pl5 pr5 font-weight-normal color-black-4 zb-b-b">{intl.get('order.filled')}</th>
           <th className="text-center pl10 pr10 pt5 pb5 font-weight-normal color-black-4 zb-b-b text-nowrap">
             {
               orders.items && orders.items.length > 0 &&
-              <Button onClick={cancelOrderByTokenPair.bind(this)} type="ghost" style={{height:'24px',lineHeight:'24px'}} className="fs12 d-inline-block ml5 bg-primary-light text-primary border-none" size="small">
+              <Button onClick={cancelOrderByTokenPair.bind(this)} type="primary" style={{height:'24px',lineHeight:'24px'}} className="d-inline-block ml5" size="small">
                 {intl.get('common.cancel')}
               </Button>
             }
@@ -225,20 +248,10 @@ const HelperOfMyOrders = ({orders = {}, dispatch}) => {
       </table>
       {
         orders.items && orders.items.length > 0 &&
-        <div>
-          <Devices.NotDesktop>
-              <div className="zb-b-b color-black-4 text-center pt10 pb10 fs13 hover-default" onClick={routeActions.gotoPath.bind(this,'/dex/usercenter/orders')}>
-                <span className="">{intl.get('common.all')} {intl.get('common.orders')}</span>
-              </div>
-          </Devices.NotDesktop>
-          <Devices.IsDesktop1>
-              <div className="zb-b-b color-black-4 text-center pt10 pb10 fs13 hover-default" onClick={showLayer.bind(this,{id:'usercenter'})}>
-                <span className="">{intl.get('common.all')} {intl.get('common.orders')}</span>
-              </div>
-          </Devices.IsDesktop1>
+        <div className="zb-b-b color-black-4 text-center pt10 pb10 fs13" onClick={routeActions.gotoPath.bind(this,'/dex/usercenter/orders')}>
+          <span className="">{intl.get('common.all')} {intl.get('common.orders')}</span>
         </div>
       }
-      
     </div>
 
   )

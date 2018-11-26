@@ -3,7 +3,7 @@ import { Button, InputItem, List, SegmentedControl, Toast ,Modal} from 'antd-mob
 import { Icon as WebIcon,Affix } from 'antd'
 import { connect } from 'dva'
 import { getTokensByMarket } from 'modules/formatter/common'
-import { getDisplaySymbol, toBig,toNumber} from 'LoopringJS/common/formatter'
+import { getDisplaySymbol, toBig,toNumber, toHex } from 'LoopringJS/common/formatter'
 import intl from 'react-intl-universal'
 import * as orderFormatter from 'modules/orders/formatters'
 import moment from 'moment'
@@ -68,7 +68,8 @@ class PlaceOrderForm extends React.Component {
   }
 
   render(){
-    const {dispatch,placeOrder,marketcap,balance,preference,trading,lastPrice} = this.props
+    const {dispatch,placeOrder,marketcap,balance,preference,trading,lastPrice, pendingTx, gas} = this.props
+    const gasPrice = toHex(toBig(gas.tabSelected === 'estimate' ? gas.gasPrice.estimate : gas.gasPrice.current))
     const {side,pair} = placeOrder
     const tokens = getTokensByMarket(pair)
     const marketConfig = config.getMarketBySymbol(tokens.left, tokens.right)
@@ -185,7 +186,7 @@ class PlaceOrderForm extends React.Component {
       }
     }
 
-    const submitOrder = () => {
+    const submitOrder = async () => {
       const total = toBig(price).times(amount)
       const totalWorth = orderFormatter.calculateWorthInLegalCurrency(marketcap, tokens.right, total)
       if(!totalWorth.gt(0)) {
@@ -196,32 +197,39 @@ class PlaceOrderForm extends React.Component {
         })
         return
       }
-      let allowed = false
-      let currency = preference.currency;
-      let priceSymbol = getDisplaySymbol(currency)
-      if(currency === 'USD') {
-        priceSymbol = '10' + priceSymbol
-        if(totalWorth.gt(10)) {
-          allowed = true
-        }
-      } else {
-        priceSymbol = '50' + priceSymbol
-        if(totalWorth.gt(50)) {
-          allowed = true
-        }
-      }
-      if(!allowed) {
-        Notification.open({
-          message:intl.get('notifications.title.not_allowed_place_order_worth'),
-          description:intl.get('notifications.message.not_allowed_place_order_worth', {worth: priceSymbol}),
-          type:'error'
-        })
+      const tradeInfo = {}
+      tradeInfo.amountB = toBig(toBig(side.toLowerCase() === 'buy' ? amount : total))
+      tradeInfo.amountS = toBig(side.toLowerCase() === 'sell' ? amount : total)
+      tradeInfo.tokenB = buy.token
+      tradeInfo.tokenS = sell.token
+      try {
+        await orderFormatter.p2pVerification(balance, tradeInfo, pendingTx ? pendingTx.items : [], gasPrice)
+      } catch (e) {
+        Toast.fail(e.message, 3, null, false);
+        this.setState({submitLoading:false})
         return
       }
-      const validSince = moment()
-      const validUntil = moment().add(1, 'months')
-      dispatch({type:'placeOrder/validTimeChange', payload:{validSince, validUntil}})
-      showLayer({id:'placeOrderSteps'})
+      if (tradeInfo.error && tradeInfo.error.length > 0) {
+        tradeInfo.error.forEach(item => {
+          switch (item.type) {
+            case 'BalanceNotEnough':
+              Toast.fail(intl.get('p2p_order.frozen_balance_not_enough', {
+                frozen: item.value.frozen,
+                require: item.value.required,
+                token: item.value.symbol
+              }), 8, null, false);
+              break;
+            case 'AllowanceNotEnough':
+              Toast.fail(intl.get('p2p_order.p2p_allowance_not_enough', {token: item.value.symbol}), 8, null, false);
+              break;
+          }
+        })
+      } else {
+        const validSince = moment().subtract(1, 'hours')
+        const validUntil = moment().add(1, 'months')
+        dispatch({type:'ttl/validTimeChange', payload:{validSince, validUntil}})
+        showLayer({id:'placeOrderSteps'})
+      }
     }
 
     const showAmountHelper = () => {
@@ -258,9 +266,9 @@ class PlaceOrderForm extends React.Component {
               moneyKeyboardWrapProps={moneyKeyboardWrapProps}
               className="circle h-default mt15"
               extra={
-                <div className="fs14 cursor-pointer color-black-3 zb-b-l d-flex align-items-center justify-content-center w-65" style={{position:'absolute',right:0,top:'0',bottom:'0',margin:'auto'}} >
-                  <span className="color-black-3 d-inline-block">{tokens.right}</span>
-                  <div className="text-primary text-right pr10 text-nowrap w-65" style={{position:'absolute',marginLeft:'-100%'}}>
+                <div className="fs14 cursor-pointer color-black-1 d-flex align-items-center justify-content-center w-50" style={{position:'absolute',right:0,top:'0',bottom:'0',margin:'auto'}} >
+                  <span className="color-black-1 fs13 d-inline-block mr5">{tokens.right}</span>
+                  <div className="text-primary text-right pr10 text-nowrap" style={{position:'absolute',marginLeft:'-100%'}}>
                     {
                       price>0 && <span className="color-black-4 fs12">≈ <Worth amount={price} symbol={tokens.right}/></span>
                     }
@@ -268,7 +276,7 @@ class PlaceOrderForm extends React.Component {
                 </div>
               }
               onChange={priceChange}
-            ><div className="fs14 color-black-3 pr5 w-50">{intl.get("common.price")}</div></InputItem>
+            ><div className="fs13 color-black-1 pr5 w-50">{intl.get("common.price")}</div></InputItem>
             <InputItem
               type="money"
               placeholder={amountPrecision > 0 ? `0.${'0'.repeat(amountPrecision)}` : '0'}
@@ -279,14 +287,14 @@ class PlaceOrderForm extends React.Component {
               moneyKeyboardWrapProps={moneyKeyboardWrapProps}
               className="circle h-default mt15"
               extra={
-                <div className="fs14 cursor-pointer color-black-3 zb-b-l d-flex align-items-center justify-content-center w-65" style={{position:'absolute',right:0,top:'0',bottom:'0',margin:'auto'}} >
-                  <span className="color-black-3 d-inline-block">{tokens.left}</span>
-                  <div onClick={showAmountHelper} className="text-primary cursor-pointer text-right pr0 text-nowrap w-30" style={{position:'absolute',marginLeft:'-100%'}}>
+                <div className="fs14 cursor-pointer color-black-1 d-flex align-items-center justify-content-center w-50" style={{position:'absolute',right:0,top:'0',bottom:'0',margin:'auto'}} >
+                  <span className="color-black-1 fs13 d-inline-block mr5">{tokens.left}</span>
+                  <div onClick={showAmountHelper} className="text-primary cursor-pointer text-right pr10 text-nowrap" style={{position:'absolute',marginLeft:'-100%'}}>
                     <WebIcon className="text-primary fs14" type="sliders"/>
                   </div>
                 </div>
               }
-            ><div className="fs14 color-black-3 pr5 w-50">{intl.get("common.amount")}</div></InputItem>
+            ><div className="fs13 color-black-1 pr5 w-50">{intl.get("common.amount")}</div></InputItem>
             {
               false &&
               <List.Item
@@ -300,7 +308,7 @@ class PlaceOrderForm extends React.Component {
                 }
               >
                 <div className="">
-                  <span className="d-inline-block mr5 fs12 color-black-4 w-50">{intl.get("common.total")}</span>
+                  <span className="d-inline-block mr5 fs12 color-black-4" style={{width:'50px'}}>{intl.get("common.total")}</span>
                 </div>
               </List.Item>
             }
@@ -316,6 +324,26 @@ class PlaceOrderForm extends React.Component {
                  }
                </div>
               </Button>
+              {
+                false && side === 'sell' &&
+                <Button onClick={toConfirm} className={`w-100 d-block mt15 fs16 ${submitEnable ? " " : "t-light-bak"}`} type={"primary"} disabled={false}>
+                  <div className="row ml0 mr0 no-gutters">
+                    <div className="col">{amount ? amount : 0} {tokens.left}</div>
+                    <div className="col-auto" style={{background:'rgba(0,0,0,0.05)',padding:'0 1.2rem'}}>→</div>
+                    <div className="col">{intl.get('common.total')} {total} {tokens.right}</div>
+                  </div>
+                </Button>
+              }
+              {
+                false && side === 'buy' &&
+                <Button onClick={toConfirm} className={`w-100 d-block mt15 fs16 ${submitEnable ? " " : "t-light-bak"}`} type={"primary"} disabled={false}>
+                  <div className="row ml0 mr0 no-gutters">
+                    <div className="col">{total} {tokens.right}</div>
+                    <div className="col-auto" style={{background:'rgba(0,0,0,0.05)',padding:'0 1.2rem'}}>→</div>
+                    <div className="col">{amount ? amount : 0} {tokens.left}</div>
+                  </div>
+                </Button>
+              }
           </List>
         </div>
         <div className="divider 1px zb-b-t"></div>
@@ -326,15 +354,19 @@ class PlaceOrderForm extends React.Component {
 
 }
 export default connect(({
-                          placeOrder,
-                          sockets:{tickers, balance, marketcap},
-                          settings:{preference,trading}
-                        })=>({
+  placeOrder,
+  sockets:{tickers, balance, marketcap},
+  settings:{preference,trading},
+  pendingTx,
+  gas
+})=>({
   placeOrder,
   lastPrice:tickers.item.loopr ? tickers.item.loopr.last : null,
   balance:balance.items ? balance.items : null,
   marketcap:marketcap.items ? marketcap.items : null,
-  preference,trading
+  preference,trading,
+  pendingTx:pendingTx,
+  gas:gas,
 }))(PlaceOrderForm)
 
 

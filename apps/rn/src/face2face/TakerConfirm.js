@@ -16,12 +16,13 @@ import * as orderFormatter from 'modules/orders/formatters'
 import eachOfLimit from "async/eachOfLimit";
 import TokenFm from 'modules/tokens/TokenFm'
 import Worth from 'modules/settings/Worth'
+import HelperOfBalances from 'ui/face2face/HelperOfBalances'
 
 
 const OrderMetaItem = (props) => {
   const {label, value} = props
   return (
-    <div className="row ml0 mr0 pl0 pr0 zb-b-t no-gutters" style={{padding: '7px 0px'}}>
+    <div className="row ml0 mr0 pl15 pr15 zb-b-b no-gutters" style={{padding: '7px 0px'}}>
       <div className="col">
         <div className="fs14 color-black-1 lh25 text-left">{label}</div>
       </div>
@@ -80,13 +81,20 @@ class TakerConfirm extends React.Component {
     }
 
     const submitRing = async () => {
-      if (!socket) {
+      if (!socket || balance.length === 0) {
         Notification.open({description: intl.get('notifications.message.wait_for_load_data'), type: 'error'});
         return
       }
       const makerOrderErrors = await orderFormatter.verifyMakerOrder(makerOrder.originalOrder, makerOrder.count);
       if (makerOrderErrors.length > 0) {
         const item = makerOrderErrors[0]
+        if(item.type === 'sameOwner'){
+          Notification.open({
+            description: intl.get('common.errors.' + item.value.errorCode),
+            type: 'error',
+          })
+        }
+
         if (item.type === "BalanceNotEnough") {
           Notification.open({
             description: intl.get('p2p_order.maker_balance_not_enough', {
@@ -101,7 +109,7 @@ class TakerConfirm extends React.Component {
           Notification.open({
             description: intl.get('p2p_order.maker_allowance_not_enough', {
               required: item.value.required,
-              allowance: item.value.balance,
+              allowance: toNumber(item.value.allowance),
               token: item.value.symbol
             }),
             type: 'error',
@@ -135,7 +143,6 @@ class TakerConfirm extends React.Component {
         dispatch({type: 'p2pOrder/loadingChange', payload: {loading: false}})
         return
       }
-
       if (tradeInfo.error && tradeInfo.error[0]) {
         const item = tradeInfo.error[0]
         if (item.value.symbol.toLowerCase() === 'eth') {
@@ -168,103 +175,10 @@ class TakerConfirm extends React.Component {
         return
       }
       try {
-        const {unsigned} = await orderFormatter.signP2POrder(tradeInfo, address)
-        const signResult = await signOrder(completeOrder)
-        if (signResult.error) {
-          Notification.open({
-            message: intl.get('notifications.title.place_order_failed'),
-            description: signResult.error.message,
-            type: 'error'
-          })
-          return
-        }
-        const signedOrder = {...completeOrder, ...signResult.result, powNonce: 100}
-        const txs = unsigned.filter(item => item.type === 'tx');
-        eachOfLimit(txs, 1, async (item, key, callback) => {
-          signTx(item.data).then(res => {
-            if (res.result) {
-              window.ETH.sendRawTransaction(res.result).then(resp => {
-                if (resp.result) {
-                  window.RELAY.account.notifyTransactionSubmitted({
-                    txHash: resp.result,
-                    rawTx: item.data,
-                    from: address
-                  })
-                  callback()
-                } else {
-                  callback(resp.error)
-                }
-              })
-            } else {
-              callback(res.error)
-            }
-          })
-        }, async function (e) {
-          if (e) {
-            Notification.open({
-              message: intl.get('notifications.title.place_order_failed'),
-              description: e.message,
-              type: 'error'
-            })
-          } else {
-            const nonce = txs.length > 0 ? toHex(toNumber(txs[txs.length - 1].data.nonce) + 1) : toHex((await window.RELAY.account.getNonce(address)).result)
-            const tx = {
-              value: '0x0',
-              gasLimit: config.getGasLimitByType('submitRing').gasLimit,
-              chainId: config.getChainId(),
-              to: order.protocol,
-              gasPrice,
-              nonce,
-              data: Contracts.LoopringProtocol.encodeSubmitRing([{...signedOrder}, {
-                ...makerOrder.originalOrder,
-                tokenS: config.getTokenBySymbol(makerOrder.originalOrder.tokenS).address,
-                tokenB: config.getTokenBySymbol(makerOrder.originalOrder.tokenB).address,
-                owner: makerOrder.originalOrder.address,
-                marginSplitPercentage: toNumber(makerOrder.originalOrder.marginSplitPercentage)
-              }], address)
-            };
-            window.RELAY.order.placeOrderForP2P({
-              ...signedOrder,
-              authPrivateKey: ''
-            }, makerOrder.originalOrder.hash).then(response => {
-              if (response.error) {
-                Notification.open({
-                  message: intl.get('notifications.title.place_order_failed'),
-                  description: response.error.code ? intl.get('common.errors' + response.error.message) : response.error.message,
-                  type: 'error'
-                })
-                return;
-              }
-              signTx(tx).then(res => {
-                if (res.result) {
-                  window.RELAY.ring.submitRingForP2P({
-                    makerOrderHash: makerOrder.originalOrder.hash,
-                    rawTx: res.result,
-                    takerOrderHash: response.result
-                  }).then(resp => {
-                    if (resp.result) {
-                      Toast.success(intl.get('notifications.title.submit_ring_suc'), 3, null, false)
-                      hideLayer({id: 'takerConfirm'})
-                      window.RELAY.account.notifyTransactionSubmitted({
-                        txHash: resp.result,
-                        rawTx: tx,
-                        from: address
-                      })
-                    } else {
-                      Notification.open({
-                        message: intl.get('notifications.title.submit_ring_fail'),
-                        description: resp.error.code ? intl.get('common.errors' + resp.error.message) : resp.error.message,
-                        type: 'error'
-                      })
-                    }
-                  })
-                } else {
-                  Toast.fail(intl.get('notifications.title.submit_ring_fail') + ':' + res.error.message, 3, null, false)
-                }
-              })
-            })
-          }
-        })
+        const unsigned = await orderFormatter.generateSignData({tradeInfo, order:completeOrder, completeOrder, address}) //[{type:order}, {type:tx}]
+        unsigned.push({type: 'submitRing'})
+        dispatch({type:'placeOrderSteps/unsign', payload: {task:'sign', unsign:unsigned, makerOrder}})
+        dispatch({type: 'layers/showLayer', payload: {id: 'helperOfSign'}})
       } catch (e) {
         Notification.open({
           message: intl.get('notifications.title.place_order_failed'),
@@ -275,9 +189,9 @@ class TakerConfirm extends React.Component {
     }
 
     return (
-      <div className="bg-white" style={{height: '100%'}}>
+      <div className="bg-fill" style={{height: '100%',overflow:'auto'}}>
         <NavBar
-          className="zb-b-b"
+          className="bg-white"
           mode="light"
           onLeftClick={() => hideLayer({id: 'takerConfirm'})}
           leftContent={[
@@ -286,14 +200,11 @@ class TakerConfirm extends React.Component {
         >
           <div className="color-black-1">{intl.get('p2p_order.order_title')}</div>
         </NavBar>
-        <div className="p20 bg-white">
+        <div className="bg-white"><div className="divider 1px zb-b-t"></div></div>
+        <div className="pt15 pb15 bg-white">
           <div className="pb20 row ml0 mr0 no-gutters align-items-center justify-content-center">
             <div className="col-auto">
-              <div className="bg-primary-light text-primary d-flex align-items-center justify-content-center" style={{
-                width: '4rem',
-                height: '4rem',
-                borderRadius: '50em',
-              }}>
+              <div className="bg-primary-light text-primary circle-50 center-center">
                 <i className={`icon-token-${order.tokenS} fs24`}/>
               </div>
             </div>
@@ -301,31 +212,38 @@ class TakerConfirm extends React.Component {
               <Icon type="swap" className={`color-black-1 fs20`}/>
             </div>
             <div className="col-auto">
-              <div className="bg-primary-light text-primary d-flex align-items-center justify-content-center" style={{
-                width: '4rem',
-                height: '4rem',
-                borderRadius: '50em',
-              }}>
+              <div className="bg-primary-light text-primary circle-50 center-center">
                 <i className={`icon-token-${order.tokenB} fs24`}/>
               </div>
             </div>
           </div>
-          <OrderMetaItem label={intl.get('common.sell')} value={`${tokensFm.toPricisionFixed(tokensFm.getUnitAmount(order.amountS))} ${order.tokenS} `}/>
-          <OrderMetaItem label={intl.get('common.buy')} value={`${tokenbFm.toPricisionFixed(tokenbFm.getUnitAmount(order.amountB))} ${order.tokenB} `}/>
-          <OrderMetaItem label={intl.get('common.buy')+' '+intl.get('order.price')} value={
+          <OrderMetaItem label={intl.get('common.sell')}
+                         value={`${tokensFm.toPricisionFixed(tokensFm.getUnitAmount(order.amountS))} ${order.tokenS} `}/>
+          <OrderMetaItem label={intl.get('common.buy')}
+                         value={`${tokenbFm.toPricisionFixed(tokenbFm.getUnitAmount(order.amountB))} ${order.tokenB} `}/>
+          <OrderMetaItem label={intl.get('common.buy') + ' ' + intl.get('order.price')} value={
             <span>
-                  {`1 ${order.tokenB} = ${Number(toFixed(tokensFm.getUnitAmount(order.amountS).div(tokenbFm.getUnitAmount(order.amountB)),8))} ${order.tokenS} ≈`} <Worth amount={tokensFm.getUnitAmount(order.amountS).div(tokenbFm.getUnitAmount(order.amountB))} symbol={order.tokenS}/>
+                  {`1 ${order.tokenB} = ${Number(toFixed(tokensFm.getUnitAmount(order.amountS).div(tokenbFm.getUnitAmount(order.amountB)), 8))} ${order.tokenS} ≈`}
+              <Worth amount={tokensFm.getUnitAmount(order.amountS).div(tokenbFm.getUnitAmount(order.amountB))}
+                     symbol={order.tokenS}/>
                 </span>
           }/>
 
-          <OrderMetaItem label={intl.get('common.sell')+' '+intl.get('order.price')} value={
+          <OrderMetaItem label={intl.get('common.sell') + ' ' + intl.get('order.price')} value={
             <span>
-                  {`1 ${order.tokenS} = ${Number(toFixed(tokenbFm.getUnitAmount(order.amountB).div(tokensFm.getUnitAmount(order.amountS)),8))} ${order.tokenB} ≈`} <Worth amount={tokenbFm.getUnitAmount(order.amountB).div(tokensFm.getUnitAmount(order.amountS))} symbol={order.tokenB}/>
+                  {`1 ${order.tokenS} = ${Number(toFixed(tokenbFm.getUnitAmount(order.amountB).div(tokensFm.getUnitAmount(order.amountS)), 8))} ${order.tokenB} ≈`}
+              <Worth amount={tokenbFm.getUnitAmount(order.amountB).div(tokensFm.getUnitAmount(order.amountS))}
+                     symbol={order.tokenB}/>
                 </span>
           }/>
+
           <OrderMetaItem label={intl.get('common.ttl')}
                          value={`${validSince.format('MM-DD HH:mm')} ~ ${validUntil.format('MM-DD HH:mm')}`}/>
-          <Button type="primary" className="mt15" onClick={submitRing}>{intl.get('common.exchange')}</Button>
+          <Button type="primary" className="mt15 ml15 mr15" onClick={submitRing}>{intl.get('common.exchange')}</Button>
+        </div>
+        <div className="bg-white mt10">
+          <div className="pt15 pb15 pl10 fs16 text-left color-black-1">{intl.get('user_center.my_assets')}</div>
+          <HelperOfBalances />
         </div>
       </div>
     )

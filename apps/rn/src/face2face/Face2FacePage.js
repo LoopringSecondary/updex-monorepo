@@ -5,15 +5,15 @@ import { connect } from 'dva'
 import routeActions from 'common/utils/routeActions'
 import { getTokensByMarket } from 'modules/formatter/common'
 import HelperOfOrders from './HelperOfOrders'
-import HelperOfBalances from './HelperOfBalances'
-import HelperOfMarkets from './HelperOfMarkets'
+import HelperOfBalances from 'ui/face2face/HelperOfBalances'
+import HelperOfMarkets from 'ui/face2face/HelperOfMarkets'
 import Face2FaceForm from './Face2FaceForm'
 import intl from 'react-intl-universal'
 import {store} from "../index";
-import NumberOfTodos from "../dex/notifications/NumberOfTodos";
+import NumberOfTodos from "ui/dex/notifications/NumberOfTodos";
 
 class Face2FacePage extends React.Component {
-  
+
   // componentDidMount(){
   //    window.handleP2POrder({result:JSON.stringify({value:{"auth":"27b72006191a23d621fbe2c1491558f5c992e58c5149c070baa7bb7a233a1d98","hash":"0x17192de7258b5ce7423e3ddf27a08cc53f60d87ed412b94299846a4cbe121d1d","count":1}})})
   // }
@@ -53,25 +53,26 @@ class Face2FacePage extends React.Component {
       dispatch({type:'p2pOrder/swap'})
     }
     return (
-        <div className="bg-fill" style={{height:'100%'}}>
+        <div className="">
           <div className="bg-white">
             <NavBar
-              className="bg-white"
+              className="zb-b-b"
               mode="light"
+              onLeftClick={routeActions.gotoPath.bind(this,'/dex/home')}
               leftContent={[
-                <span onClick={()=>routeActions.goBack()} className="text-primary cursor-pointer" key="1"><WebIcon type="home" theme="" /></span>
+                <WebIcon key="1" type="home" theme="" />
               ]}
               rightContent={[
-                <span onClick={()=>showLayer({id:'helperOfFAQ'})} className="text-primary cursor-pointer" key="1"><WebIcon type="question-circle" theme="" /></span>
+                <NumberOfTodos key="1"><span onClick={()=>showLayer({id:'notifications'})} className="text-primary fs16 mr10" key="1"><WebIcon type="bell" /></span></NumberOfTodos>,
+                <span onClick={()=>showLayer({id:'helperOfFAQ'})} className="text-primary ml10" key="2"><WebIcon type="question-circle" /></span>
               ]}
             >
               <div className="color-black">
                 {intl.get('p2p_order.order_title')}
               </div>
             </NavBar>
-            <div className="divider 1px zb-b-t"></div>
           </div>
-
+          <div className="divider 1px zb-b-t"></div>
           <div className="bg-white">
             <Face2FaceForm side="sell" showLayer={showLayer} />
           </div>

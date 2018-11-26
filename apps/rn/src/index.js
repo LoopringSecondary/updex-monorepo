@@ -2,7 +2,7 @@ import '@babel/polyfill'
 import dva from 'dva'
 import { models } from 'modules'
 import { message } from 'antd'
-import { Toast,Modal } from 'antd-mobile'
+import { Toast } from 'antd-mobile'
 import 'assets/css/index.less'
 import { setLocale } from 'common/utils/localeSetting'
 import storage from 'modules/storage'
@@ -10,8 +10,9 @@ import Eth from 'LoopringJS/ethereum/eth'
 import Relay from 'LoopringJS/relay/relay'
 import Notification from 'LoopringUI/components/Notification'
 import intl from 'react-intl-universal'
-import {configs} from 'common/config/data'
-import {privateKeytoAddress} from 'LoopringJS/ethereum/account'
+import { configs } from 'common/config/data'
+import config from 'common/config'
+import { getSupportedToken } from './init'
 
 const latestVersion = Number(configs.localStorageVersion)
 const oldVersion = Number(storage.getLocalStorageVersion())
@@ -49,8 +50,8 @@ app.router(require('./router').default)
 // 5. Start
 app.start('#root')
 
-window.RELAY.market.getSupportedTokens().then(res=>{
-  if(res.result) {
+getSupportedToken().then(res => {
+  if (res.result) {
     const tokens = []
     tokens.push({
       'symbol': 'ETH',
@@ -81,12 +82,9 @@ window.RELAY.market.getSupportedTokens().then(res=>{
   })
 })
 
-
 // STORE is available when current route has rendered
 // Becarefull to use STORE in render funtion
 // window.STORE = app._store
 
 export const store = app._store
-window.STORE = store
-window._store = store
 export default app
