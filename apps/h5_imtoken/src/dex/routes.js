@@ -31,7 +31,6 @@ const Logged = (props)=>{
     return (
       <div>
         <Switch>
-          <Route path={`/dex/entry`} exact component={Pages.Entry} />
           <Route path={`/dex/scan`} exact component={ScanQrcode} />
           <Route path={`/dex/home`} exact component={Pages.Home} />
           <Route path={`/dex/markets`} exact component={Markets} />
