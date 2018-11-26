@@ -3,8 +3,8 @@ import { List, InputItem,Button,WingBlank,Slider, Tabs, WhiteSpace, Badge,Segmen
 import { Icon as WebIcon,Switch as WebSwitch } from 'antd';
 import { createForm } from 'rc-form';
 import { connect } from 'dva';
-import ListDepth from '../orders/ListDepth';
-import ListFills from '../fills/ListMarketFills';
+import ListDepth from 'ui/dex/orders/ListDepth';
+import ListFills from 'ui/dex/fills/ListMarketFills';
 import Containers from 'modules/containers';
 import UiContainers from 'LoopringUI/containers'
 import routeActions from 'common/utils/routeActions'

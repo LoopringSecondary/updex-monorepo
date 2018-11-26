@@ -1,14 +1,10 @@
 import React from 'react'
 import Containers from 'modules/containers'
 import UiContainers from 'LoopringUI/containers'
-import OrderDetail from './Detail'
+import OrderDetail from 'ui/dex/orders/Detail'
 import PlaceOrderSteps from './PlaceOrderSteps'
-import HelperOfAdvance from './HelperOfAdvance'
-import HelperOfPrice from './HelperOfPrice'
-import HelperOfAmount from './HelperOfAmount'
-import HelperOfMarket from './HelperOfMarket'
-import HelperOfTTL from './HelperOfTTL'
-import HelperOfLRCFee from './HelperOfLRCFee'
+import HelperOfAmount from 'ui/dex/orders/HelperOfAmount'
+import HelperOfMarket from 'ui/dex/orders/HelperOfMarket'
 
 function Modals(props) {
   return (
@@ -23,16 +19,6 @@ function Modals(props) {
           <PlaceOrderSteps />
         </UiContainers.Popups>
       </Containers.Layers>
-      <Containers.Layers id="helperOfAdvance">
-        <UiContainers.Popups id="helperOfAdvance">
-          <HelperOfAdvance />
-        </UiContainers.Popups>
-      </Containers.Layers>
-      <Containers.Layers id="helperOfPrice">
-        <UiContainers.Popups id="helperOfPrice">
-          <HelperOfPrice />
-        </UiContainers.Popups>
-      </Containers.Layers>
       <Containers.Layers id="helperOfAmount">
         <UiContainers.Popups id="helperOfAmount">
           <HelperOfAmount />
@@ -41,16 +27,6 @@ function Modals(props) {
       <Containers.Layers id="helperOfMarket">
         <UiContainers.Popups id="helperOfMarket">
           <HelperOfMarket />
-        </UiContainers.Popups>
-      </Containers.Layers>
-      <Containers.Layers id="helperOfTTL">
-        <UiContainers.Popups id="helperOfTTL" className="" style={{height:'100%'}}>
-          <HelperOfTTL />
-        </UiContainers.Popups>
-      </Containers.Layers>
-      <Containers.Layers id="helperOfLRCFee">
-        <UiContainers.Popups id="helperOfLRCFee">
-          <HelperOfLRCFee />
         </UiContainers.Popups>
       </Containers.Layers>
     </div>
